@@ -1,2 +1,7 @@
 @import "tailwindcss";
 
+header {
+  border: 0px solid black;
+  height: 60px;
+  background-color: white;
+}
