@@ -1,6 +1,7 @@
-"use client";
-
 import { useEffect, useState } from "react";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faRightToBracket, faCircleUser } from '@fortawesome/free-solid-svg-icons'; 
+import { faFacebook } from '@fortawesome/free-brands-svg-icons';
 
 declare global {
   interface Window {
@@ -35,7 +36,6 @@ export default function Header() {
             { fields: "id,name,email,picture" },
             (userInfo: any) => {
               setUser(userInfo);
-              // Lưu thông tin vào localStorage nếu muốn duy trì sau reload
               localStorage.setItem("fb_user", JSON.stringify(userInfo));
             }
           );
@@ -52,7 +52,6 @@ export default function Header() {
       document.body.appendChild(js);
     };
 
-    // Load SDK và phục hồi trạng thái từ localStorage nếu có
     loadFBSDK();
 
     const savedUser = localStorage.getItem("fb_user");
@@ -102,6 +101,30 @@ export default function Header() {
     }
   };
 
+  // Gửi tin nhắn từ Page
+  const sendMessage = async () => {
+    const pageAccessToken = "YOUR_PAGE_ACCESS_TOKEN"; // Lấy từ Facebook API hoặc lưu trong DB
+    const recipientId = "RECIPIENT_USER_ID"; // ID người nhận
+    const message = "Hello from my Facebook page!"; // Tin nhắn gửi đi
+
+    try {
+      const res = await fetch("http://localhost:5000/api/facebook-auth/send-message", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ pageAccessToken, recipientId, message }),
+      });
+
+      if (!res.ok) throw new Error("Error sending message");
+
+      const data = await res.json();
+      console.log("Message sent:", data);
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
+  };
+
   // Đăng xuất Facebook
   const handleLogout = () => {
     window.FB.logout(() => {
@@ -124,10 +147,8 @@ export default function Header() {
           </nav>
 
           {user ? (
-           <div className="relative flex items-center space-x-4">
+            <div className="relative flex items-center space-x-4">
               <p className="font-bold">{user.name}</p>
-        
-              {/* Avatar */}
               <div className="relative">
                 <img
                   src={user.picture?.data?.url}
@@ -135,50 +156,52 @@ export default function Header() {
                   className="w-10 h-10 rounded-full cursor-pointer"
                   onClick={() => setIsOpen(!isOpen)}
                 />
-        
-                {/* Dropdown menu */}
                 {isOpen && (
                   <div className="absolute right-0 mt-2 w-32 bg-white border rounded shadow-md z-10">
                     <button
                       onClick={handleLogout}
-                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 cursor-pointer"
                     >
                       Log out
+                    </button>
+                    <button
+                      onClick={sendMessage}
+                      className="block w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-gray-100"
+                    >
+                      Send Message
                     </button>
                   </div>
                 )}
               </div>
             </div>
           ) : (
-          <button
-            className="bg-emerald-950 text-white rounded-[50px] px-4 py-1 transition"
-            onClick={() => setIsModalOpen(true)}
-          >
-            Log in
-          </button>
+            <button
+              className="bg-emerald-950 text-white rounded-[50px] px-4 py-1 transition cursor-pointer"
+              onClick={() => setIsModalOpen(true)}
+            >
+              <FontAwesomeIcon icon={faRightToBracket} className="mr-[5px]"/> Sign in
+            </button>
           )}
         </div>
       </header>
-
       {isModalOpen && (
         <div className="fixed inset-0 bg-emerald-950 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded shadow-lg w-full max-w-sm">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Log in</h2>
+            <FontAwesomeIcon icon={faCircleUser} className="text-[20px]"/> 
+            <h2 className="text-xl font-semibold">Sign in</h2>
               <span
-                className="text-xl cursor-pointer text-gray-600 hover:text-red-600"
+                className="text-[25px] cursor-pointer text-gray-600 hover:text-red-600"
                 onClick={() => setIsModalOpen(false)}
               >
-                ✕
+                ×
               </span>
             </div>
-
             <button
-              type="button"
+              className="w-full bg-blue-600 text-white py-2 rounded cursor-pointer hover:bg-blue-700"
               onClick={handleLogin}
-              className="bg-blue-600 text-white rounded px-4 py-2 hover:bg-blue-700 transition w-full"
             >
-              Log in with Facebook
+              <FontAwesomeIcon icon={faFacebook} className="text-white" /> Sign in with Facebook
             </button>
           </div>
         </div>

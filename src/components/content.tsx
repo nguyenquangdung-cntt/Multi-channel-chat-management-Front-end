@@ -16,7 +16,7 @@ export default function Content() {
                             className="w-full px-6 py-2 pr-28 text-gray-800 bg-white rounded-full outline-none shadow-lg"
                         />
                         <button
-                            className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-orange-500 text-white px-3 py-2 rounded-full font-bold hover:bg-orange-600 transition text-sm"
+                            className="cursor-pointer absolute top-1/2 right-1 transform -translate-y-1/2 bg-orange-500 text-white px-3 py-2 rounded-full font-bold hover:bg-orange-600 transition text-sm"
                         >
                             <FontAwesomeIcon icon={faMagnifyingGlass} />
                         </button>
