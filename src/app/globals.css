@@ -5,3 +5,12 @@ header {
   height: 60px;
   background-color: white;
 }
+
+@media screen and (max-width: 1700px) {
+  #content-chat{
+    height: 605px;
+  }
+  #sidebar{
+    height: 640px;
+  }
+}

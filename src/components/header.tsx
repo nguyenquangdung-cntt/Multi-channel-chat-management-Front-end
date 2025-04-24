@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRightToBracket, faCircleUser } from '@fortawesome/free-solid-svg-icons'; 
 import { faFacebook } from '@fortawesome/free-brands-svg-icons';
+import logo from "../../public/images/logo.png";
 
 declare global {
   interface Window {
@@ -14,6 +15,7 @@ export default function Header() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
 
   // Load SDK & check login status
   useEffect(() => {
@@ -37,6 +39,13 @@ export default function Header() {
             (userInfo: any) => {
               setUser(userInfo);
               localStorage.setItem("fb_user", JSON.stringify(userInfo));
+
+              // Lưu thông tin page vào localStorage
+              const savedPage = localStorage.getItem("fb_page");
+              if (savedPage) {
+                const { pageID, pageAccessToken } = JSON.parse(savedPage);
+                // Bạn có thể lưu lại trong state hoặc sử dụng theo nhu cầu
+              }
             }
           );
         }
@@ -58,9 +67,14 @@ export default function Header() {
     if (savedUser) {
       setUser(JSON.parse(savedUser));
     }
+
+    const savedPage = localStorage.getItem("fb_page");
+    if (savedPage) {
+      const { pageID, pageAccessToken } = JSON.parse(savedPage);
+      // Lưu pageID và pageAccessToken vào state hoặc thực hiện các hành động khác với chúng
+    }
   }, []);
 
-  // Đăng nhập Facebook
   const handleLogin = () => {
     window.FB.login(
       (response: any) => {
@@ -70,27 +84,52 @@ export default function Header() {
           window.FB.api(
             "/me",
             { fields: "id,name,email,picture" },
-            (userInfo: any) => {
+            async (userInfo: any) => {
               setUser(userInfo);
               localStorage.setItem("fb_user", JSON.stringify(userInfo));
-              void saveUser(userID, accessToken, userInfo);
+
+              // 👉 Lấy danh sách page
+              window.FB.api(
+                "/me/accounts",
+                async (resPages: any) => {
+                  if (resPages?.data?.length > 0) {
+                    const page = resPages.data[0]; // Lấy page đầu tiên (có thể cho user chọn sau)
+                    const pageID = page.id;
+                    const pageAccessToken = page.access_token;
+
+                    // Lưu page access token vào localStorage
+                    localStorage.setItem("fb_page", JSON.stringify({ pageID, pageAccessToken }));
+
+                    // 👉 Gửi thông tin user + page về server
+                    await saveUser(userID, accessToken, userInfo, pageID, pageAccessToken);
+                  } else {
+                    alert("Bạn chưa quản lý trang nào.");
+                  }
+                }
+              );
             }
           );
         }
       },
-      { scope: "public_profile,email" }
+      { scope: "public_profile,email,pages_show_list,pages_read_engagement,pages_messaging" }
     );
   };
 
-  // Gửi thông tin user về server
-  const saveUser = async (userID: string, accessToken: string, userInfo: any) => {
+  const saveUser = async (
+    userID: string,
+    accessToken: string,
+    userInfo: any,
+    pageID: string,
+    pageAccessToken: string
+  ) => {
+    setLoading(true);
     try {
       const res = await fetch("http://localhost:5000/api/facebook-auth", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userID, accessToken, userInfo }),
+        body: JSON.stringify({ userID, accessToken, userInfo, pageID, pageAccessToken }),
       });
 
       if (!res.ok) throw new Error("Server login failed");
@@ -98,6 +137,8 @@ export default function Header() {
       setIsModalOpen(false);
     } catch (error) {
       console.error("Error saving to backend:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -130,21 +171,17 @@ export default function Header() {
     window.FB.logout(() => {
       setUser(null);
       localStorage.removeItem("fb_user");
+      localStorage.removeItem("fb_page"); // Xóa thông tin page token khi đăng xuất
     });
   };
 
   return (
     <>
       <header>
-        <div className="container mx-auto flex justify-between items-center py-4 px-6">
-          <div className="text-2xl font-bold text-gray-800">MyWebsite</div>
-
-          <nav className="space-x-6">
-            <a href="/" className="text-gray-700 hover:text-emerald-950">Home</a>
-            <a href="#" className="text-gray-700 hover:text-emerald-950">About</a>
-            <a href="#" className="text-gray-700 hover:text-emerald-950">Services</a>
-            <a href="#" className="text-gray-700 hover:text-emerald-950">Contact</a>
-          </nav>
+        <div className=" flex justify-between items-center py-4 px-6">
+          <a href="/">
+            <img src={logo.src} alt="Logo" className="w-[100px] h-[20px]" />
+          </a>
 
           {user ? (
             <div className="relative flex items-center space-x-4">
@@ -157,7 +194,7 @@ export default function Header() {
                   onClick={() => setIsOpen(!isOpen)}
                 />
                 {isOpen && (
-                  <div className="absolute right-0 mt-2 w-32 bg-white border rounded shadow-md z-10">
+                  <div className="absolute right-0 mt-2 w-32 bg-white rounded shadow-md z-10">
                     <button
                       onClick={handleLogout}
                       className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 cursor-pointer"
@@ -176,7 +213,7 @@ export default function Header() {
             </div>
           ) : (
             <button
-              className="bg-emerald-950 text-white rounded-[50px] px-4 py-1 transition cursor-pointer"
+              className="bg-blue-700 text-white rounded-[50px] px-4 py-1 transition cursor-pointer"
               onClick={() => setIsModalOpen(true)}
             >
               <FontAwesomeIcon icon={faRightToBracket} className="mr-[5px]"/> Sign in
@@ -185,7 +222,7 @@ export default function Header() {
         </div>
       </header>
       {isModalOpen && (
-        <div className="fixed inset-0 bg-emerald-950 bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-blue-900 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded shadow-lg w-full max-w-sm">
             <div className="flex justify-between items-center mb-4">
             <FontAwesomeIcon icon={faCircleUser} className="text-[20px]"/> 
