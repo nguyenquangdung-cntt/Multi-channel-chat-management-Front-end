@@ -7,7 +7,7 @@ const mockUsers = [
   { id: 2, name: "Bob" },
 ];
 
-const initialMessages = {
+const initialMessages: Record<number, { from: string; text: string }[]> = {
   1: [{ from: "bot", text: "Hello! How can I help you?" }],
   2: [{ from: "bot", text: "Hi! Need support?" }],
 };

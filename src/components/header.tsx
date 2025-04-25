@@ -68,11 +68,11 @@ export default function Header() {
       setUser(JSON.parse(savedUser));
     }
 
-    const savedPage = localStorage.getItem("fb_page");
-    if (savedPage) {
-      const { pageID, pageAccessToken } = JSON.parse(savedPage);
-      // Lưu pageID và pageAccessToken vào state hoặc thực hiện các hành động khác với chúng
-    }
+    // const savedPage = localStorage.getItem("fb_page");
+    // if (savedPage) {
+    //   const { pageID, pageAccessToken } = JSON.parse(savedPage);
+    //   // Lưu pageID và pageAccessToken vào state hoặc thực hiện các hành động khác với chúng
+    // }
   }, []);
 
   const handleLogin = () => {
