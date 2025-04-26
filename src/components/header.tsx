@@ -173,6 +173,7 @@ export default function Header() {
       setUser(null);
       localStorage.removeItem("fb_user");
       localStorage.removeItem("fb_page"); // Xóa thông tin page token khi đăng xuất
+      window.location.reload();
     });
   };
 
@@ -224,7 +225,7 @@ export default function Header() {
       </header>
       {isModalOpen && (
         <div className="fixed inset-0 bg-blue-900 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded shadow-lg w-full max-w-sm">
+          <div className="bg-white p-6 rounded shadow-lg w-full max-w-lg">
             <div className="flex justify-between items-center mb-4">
             <FontAwesomeIcon icon={faCircleUser} className="text-[20px]"/> 
             <h2 className="text-xl font-semibold">Sign in</h2>
