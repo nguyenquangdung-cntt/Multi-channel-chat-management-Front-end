@@ -14,3 +14,26 @@ header {
     height: 640px;
   }
 }
+
+@media screen and (max-width: 426px) {
+  #modal{
+    height: 170px;
+    max-width: 500px;
+  }
+
+  #modal > div > svg{
+    font-size: 30px;
+  }
+
+  #modal > div > h2{
+    font-size: 30px;
+  }
+
+  #modal > div > span{
+    font-size: 35px;
+  }
+
+  #modal > button{
+    font-size: 22px;
+  }
+}
