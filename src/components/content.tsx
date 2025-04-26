@@ -5,7 +5,7 @@ import Image from "next/image";
 export default function ChatUI() {
 
   return (
-    <div className="flex h-[1180px] w-full bg-white items-center justify-center">
+    <div id="content-chat" className="flex h-[1180px] w-full bg-white items-center justify-center">
       <Image
         src={logo}
         alt="Logo"
