@@ -143,29 +143,29 @@ export default function Header() {
     }
   };
 
-  // Gửi tin nhắn từ Page
-  const sendMessage = async () => {
-    const pageAccessToken = "YOUR_PAGE_ACCESS_TOKEN"; // Lấy từ Facebook API hoặc lưu trong DB
-    const recipientId = "RECIPIENT_USER_ID"; // ID người nhận
-    const message = "Hello from my Facebook page!"; // Tin nhắn gửi đi
+  // // Gửi tin nhắn từ Page
+  // const sendMessage = async () => {
+  //   const pageAccessToken = "YOUR_PAGE_ACCESS_TOKEN"; // Lấy từ Facebook API hoặc lưu trong DB
+  //   const recipientId = "RECIPIENT_USER_ID"; // ID người nhận
+  //   const message = "Hello from my Facebook page!"; // Tin nhắn gửi đi
 
-    try {
-      const res = await fetch("http://localhost:5000/api/facebook-auth/send-message", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ pageAccessToken, recipientId, message }),
-      });
+  //   try {
+  //     const res = await fetch("http://localhost:5000/api/facebook-auth/send-message", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ pageAccessToken, recipientId, message }),
+  //     });
 
-      if (!res.ok) throw new Error("Error sending message");
+  //     if (!res.ok) throw new Error("Error sending message");
 
-      const data = await res.json();
-      console.log("Message sent:", data);
-    } catch (error) {
-      console.error("Error sending message:", error);
-    }
-  };
+  //     const data = await res.json();
+  //     console.log("Message sent:", data);
+  //   } catch (error) {
+  //     console.error("Error sending message:", error);
+  //   }
+  // };
 
   // Đăng xuất Facebook
   const handleLogout = () => {
@@ -202,12 +202,12 @@ export default function Header() {
                     >
                       Log out
                     </button>
-                    <button
+                    {/* <button
                       onClick={sendMessage}
                       className="block w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-gray-100"
                     >
                       Send Message
-                    </button>
+                    </button> */}
                   </div>
                 )}
               </div>
