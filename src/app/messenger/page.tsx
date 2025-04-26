@@ -1,30 +1,36 @@
-"use client"
-import { useState, useEffect } from "react";
+"use client";
+import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 
+// Định nghĩa rõ kiểu dữ liệu
+type Message = { from: "user" | "bot"; text: string };
+type Messages = { [userId: string]: Message[] };
+
+// Danh sách user mẫu
 const mockUsers = [
-  { id: "1234567890", name: "Alice" }, // Thay bằng real Facebook ID
+  { id: "1234567890", name: "Alice" },
   { id: "0987654321", name: "Bob" },
 ];
 
-const initialMessages = {
+// Tin nhắn mẫu ban đầu
+const initialMessages: Messages = {
   "1234567890": [{ from: "bot", text: "Hello! How can I help you?" }],
   "0987654321": [{ from: "bot", text: "Hi! Need support?" }],
 };
 
 export default function Page() {
-  const [selectedUser, setSelectedUser] = useState(mockUsers[0]);
-  const [messages, setMessages] = useState(initialMessages);
+  const [selectedUser, setSelectedUser] = useState<typeof mockUsers[0]>(mockUsers[0]);
+  const [messages, setMessages] = useState<Messages>(initialMessages);
   const [input, setInput] = useState("");
-  const [userID, setUserID] = useState("111111111111"); // ID người gửi — lấy từ backend sau khi user đăng nhập Facebook
+  const [userID, setUserID] = useState("111111111111"); // ID người gửi - sau này lấy từ backend
 
   const handleSend = async () => {
     if (!input.trim()) return;
 
-    const userMessage = { from: "user", text: input };
+    const userMessage: Message = { from: "user", text: input };
 
-    const updated = {
+    const updated: Messages = {
       ...messages,
       [selectedUser.id]: [userMessage, ...(messages[selectedUser.id] || [])],
     };
@@ -46,7 +52,7 @@ export default function Page() {
       const data = await res.json();
       if (data.error) throw new Error(data.error);
 
-      // Hiển thị tin nhắn phản hồi từ hệ thống
+      // Phản hồi hệ thống
       setMessages((prev) => ({
         ...prev,
         [selectedUser.id]: [
@@ -54,7 +60,7 @@ export default function Page() {
           ...prev[selectedUser.id],
         ],
       }));
-    } catch (error) {
+    } catch (error: any) {
       console.error("Send message error:", error.message);
       setMessages((prev) => ({
         ...prev,
