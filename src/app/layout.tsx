@@ -1,33 +1,45 @@
+"use client";
+
+import { useState } from "react";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Sidebar from "@/components/sidebar";
+import Header from "@/components/header";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+// const geistSans = Geist({
+//   variable: "--font-geist-sans",
+//   subsets: ["latin"],
+// });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+// const geistMono = Geist_Mono({
+//   variable: "--font-geist-mono",
+//   subsets: ["latin"],
+// });
 
-export const metadata: Metadata = {
-  title: "Multi channel chat",
-  description: "Multi-channel chat management",
-};
+// export const metadata: Metadata = {
+//   title: "Multi channel chat",
+//   description: "Multi-channel chat management",
+// };
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased `}
-      >
-        {children}
+      <body>
+        <main className="h-screen bg-blue-300 flex flex-col">
+          <Header />
+          <div className="flex flex-1">
+            <Sidebar isOpen={isSidebarOpen} toggle={() => setIsSidebarOpen(!isSidebarOpen)} />
+            <div className="flex-1 bg-blue-100 p-4">
+              {children}
+            </div>
+          </div>
+        </main>
       </body>
     </html>
   );
