@@ -9,7 +9,7 @@ export default function ChatUI() {
       <Image
         src={logo}
         alt="Logo"
-        className="w-[500px] h-[100px]"
+        className="w-[200px] h-[40px]"
       />
     </div>
   );
