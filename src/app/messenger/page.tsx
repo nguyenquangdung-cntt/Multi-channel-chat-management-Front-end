@@ -39,7 +39,8 @@ export default function Page() {
     setInput("");
 
     try {
-      const res = await fetch("http://localhost:5000/api/facebook-auth/send-message", {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const res = await fetch(`${API_URL}/api/facebook-auth/send-message`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
