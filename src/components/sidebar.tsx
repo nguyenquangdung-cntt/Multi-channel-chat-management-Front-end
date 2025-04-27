@@ -2,6 +2,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars, faHouse, faCommentDots } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
+import dash from "../../public/images/logo-dash.png";
 
 interface SidebarProps {
     isOpen: boolean;
@@ -17,12 +19,26 @@ export default function Sidebar({ isOpen, toggle }: SidebarProps) {
                 isOpen ? "w-64" : "w-20 overflow-hidden"
             }`}
         >
-            <button
-                onClick={toggle}
-                className="mb-4 bg-gray-600 p-3 rounded hover:bg-gray-500 transition flex justify-center"
+            <div className="flex items-center justify-between mb-4">
+                {/* Hình ảnh - chỉ hiển thị khi sidebar mở */}
+                {isOpen && (
+                    <Image
+                        src={dash}
+                        alt="Logo"
+                        className="w-[100px] h-10"
+                    />
+                )}
+
+                {/* Nút toggle */}
+                <button
+                    onClick={toggle}
+                    className="bg-gray-600 p-3 rounded hover:bg-gray-500 transition flex justify-center items-center"
                 >
-                <FontAwesomeIcon icon={faBars} />
-            </button>
+                    <FontAwesomeIcon icon={faBars} />
+                </button>
+            </div>
+
+
 
             <ul className="space-y-2">
                 <li className={`hover:text-blue-400 cursor-pointer p-2 rounded flex items-center gap-2 ${pathname === "/" ? "text-blue-500 font-bold bg-white" : ""}`}>
