@@ -93,10 +93,11 @@ export default function Header() {
                     const pageAccessToken = page.access_token;
 
                     // Lưu page access token vào localStorage
-                    localStorage.setItem("fb_page", JSON.stringify({ pageID, pageAccessToken }));
+                    localStorage.setItem("fb_page", JSON.stringify({page, pageID, pageAccessToken }));
 
                     // 👉 Gửi thông tin user + page về server
                     await saveUser(userID, accessToken, userInfo, pageID, pageAccessToken);
+                    window.location.reload();
                   } else {
                     alert("Bạn chưa quản lý trang nào.");
                   }

@@ -37,9 +37,6 @@ export default function Sidebar({ isOpen, toggle }: SidebarProps) {
                     <FontAwesomeIcon icon={faBars} />
                 </button>
             </div>
-
-
-
             <ul className="space-y-2">
                 <li className={`hover:text-blue-400 cursor-pointer p-2 rounded flex items-center gap-2 ${pathname === "/" ? "text-blue-500 font-bold bg-white" : ""}`}>
                     <Link href="/" className="flex items-center">
