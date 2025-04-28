@@ -102,7 +102,6 @@ export default function Header() {
 
                     // 👉 Gửi thông tin user + page về server
                     await saveUser(userID, accessToken, userInfo, pageID, pageAccessToken);
-                    window.location.reload();
                   } else {
                     alert("Bạn chưa quản lý trang nào.");
                   }
@@ -114,6 +113,7 @@ export default function Header() {
       },
       { scope: "public_profile,email,pages_show_list,pages_read_engagement,pages_messaging" }
     );
+    window.location.reload();
   };
 
   const saveUser = async (
@@ -143,30 +143,6 @@ export default function Header() {
       setLoading(false);
     }
   };
-
-  // // Gửi tin nhắn từ Page
-  // const sendMessage = async () => {
-  //   const pageAccessToken = "YOUR_PAGE_ACCESS_TOKEN"; // Lấy từ Facebook API hoặc lưu trong DB
-  //   const recipientId = "RECIPIENT_USER_ID"; // ID người nhận
-  //   const message = "Hello from my Facebook page!"; // Tin nhắn gửi đi
-
-  //   try {
-  //     const res = await fetch("http://localhost:5000/api/facebook-auth/send-message", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({ pageAccessToken, recipientId, message }),
-  //     });
-
-  //     if (!res.ok) throw new Error("Error sending message");
-
-  //     const data = await res.json();
-  //     console.log("Message sent:", data);
-  //   } catch (error) {
-  //     console.error("Error sending message:", error);
-  //   }
-  // };
 
   // Đăng xuất Facebook
   const handleLogout = () => {
@@ -204,12 +180,6 @@ export default function Header() {
                     >
                       Log out
                     </button>
-                    {/* <button
-                      onClick={sendMessage}
-                      className="block w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-gray-100"
-                    >
-                      Send Message
-                    </button> */}
                   </div>
                 )}
               </div>
