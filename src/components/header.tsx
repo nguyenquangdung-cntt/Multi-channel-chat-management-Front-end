@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRightToBracket, faCircleUser } from '@fortawesome/free-solid-svg-icons'; 
 import { faFacebook } from '@fortawesome/free-brands-svg-icons';
 import logo from "../../public/images/logo.png";
+import Link from "next/link";
 
 declare global {
   interface Window {
@@ -67,12 +68,6 @@ export default function Header() {
     if (savedUser) {
       setUser(JSON.parse(savedUser));
     }
-
-    const savedPage = localStorage.getItem("fb_page");
-    if (savedPage) {
-      const { pageID, pageAccessToken } = JSON.parse(savedPage);
-      // Lưu pageID và pageAccessToken vào state hoặc thực hiện các hành động khác với chúng
-    }
   }, []);
 
   const handleLogin = () => {
@@ -113,7 +108,6 @@ export default function Header() {
       },
       { scope: "public_profile,email,pages_show_list,pages_read_engagement,pages_messaging" }
     );
-    window.location.reload();
   };
 
   const saveUser = async (
@@ -158,9 +152,9 @@ export default function Header() {
     <>
       <header>
         <div className=" flex justify-between items-center py-4 px-6">
-          <a href="/">
+          <Link href={"/"}>
             <img src={logo.src} alt="Logo" className="w-[100px] h-[20px]" />
-          </a>
+          </Link>
 
           {user ? (
             <div className="relative flex items-center space-x-4">
