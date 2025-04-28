@@ -102,6 +102,7 @@ export default function Header() {
 
                     // 👉 Gửi thông tin user + page về server
                     await saveUser(userID, accessToken, userInfo, pageID, pageAccessToken);
+                    window.location.reload();
                   } else {
                     alert("Bạn chưa quản lý trang nào.");
                   }
