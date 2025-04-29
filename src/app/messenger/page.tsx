@@ -27,7 +27,7 @@ export default function Page() {
   const [selectedPage, setSelectedPage] = useState<Page | null>(null);
 
   useEffect(() => {
-    const storedPages = localStorage.getItem("fb_page");
+    const storedPages = localStorage.getItem("fb_pages");
     if (storedPages) {
       const parsed = JSON.parse(storedPages);
       setPages(parsed);
