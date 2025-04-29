@@ -86,6 +86,23 @@ export default function Page() {
     <div id="content-chat" className="flex h-[1180px] w-full">
       {/* Sidebar */}
       <aside className="w-64 bg-gray-100 p-4 space-y-2">
+        {/* Dropdown chọn Page */}
+        {pages.length > 0 && (
+          <select
+            value={selectedPage?.id || ""}
+            onChange={(e) => {
+              const page = pages.find((p) => p.id === e.target.value);
+              setSelectedPage(page || null);
+            }}
+            className="bg-white border border-gray-300 rounded-full text-sm h-7 px-2"
+          >
+            {pages.map((page) => (
+              <option key={page.id} value={page.id}>
+                {page.name}
+              </option>
+            ))}
+          </select>
+        )}
         <div className="relative mb-4">
           <input
             type="text"
@@ -101,24 +118,6 @@ export default function Page() {
             <FontAwesomeIcon icon={faMagnifyingGlass} className="text-white text-sm" />
           </button>
         </div>
-
-          {/* Dropdown chọn Page */}
-          {pages.length > 0 && (
-            <select
-              value={selectedPage?.id || ""}
-              onChange={(e) => {
-                const page = pages.find((p) => p.id === e.target.value);
-                setSelectedPage(page || null);
-              }}
-              className="absolute right-10 top-1/2 transform -translate-y-1/2 bg-white border border-gray-300 rounded-full text-sm h-7 px-2 outline-none"
-            >
-              {pages.map((page) => (
-                <option key={page.id} value={page.id}>
-                  {page.name}
-                </option>
-              ))}
-            </select>
-          )}
         {/* Danh sách user */}
         {mockUsers.map((user) => (
           <div
