@@ -18,7 +18,6 @@ export default function Header() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
-  // Load SDK & check login status
   useEffect(() => {
     window.fbAsyncInit = function () {
       window.FB.init({
@@ -28,32 +27,21 @@ export default function Header() {
         version: "v19.0",
       });
 
-      // Kiểm tra nếu user đã đăng nhập
       window.FB.getLoginStatus((response: any) => {
         if (response.status === "connected") {
           const { accessToken, userID } = response.authResponse;
-
-          // Gọi API để lấy thông tin user
           window.FB.api(
             "/me",
             { fields: "id,name,email,picture" },
             (userInfo: any) => {
               setUser(userInfo);
               localStorage.setItem("fb_user", JSON.stringify(userInfo));
-
-              // Lưu thông tin page vào localStorage
-              const savedPage = localStorage.getItem("fb_page");
-              if (savedPage) {
-                const { pageID, pageAccessToken } = JSON.parse(savedPage);
-                // Bạn có thể lưu lại trong state hoặc sử dụng theo nhu cầu
-              }
             }
           );
         }
       });
     };
 
-    // Tải SDK
     const loadFBSDK = () => {
       if (document.getElementById("facebook-jssdk")) return;
       const js = document.createElement("script");
@@ -83,20 +71,23 @@ export default function Header() {
               setUser(userInfo);
               localStorage.setItem("fb_user", JSON.stringify(userInfo));
 
-              // 👉 Lấy danh sách page
+              // 👉 Lấy danh sách tất cả pages
               window.FB.api(
                 "/me/accounts",
                 async (resPages: any) => {
                   if (resPages?.data?.length > 0) {
-                    const page = resPages.data[0]; // Lấy page đầu tiên (có thể cho user chọn sau)
-                    const pageID = page.id;
-                    const pageAccessToken = page.access_token;
+                    const pages = resPages.data.map((page: any) => ({
+                      id: page.id,
+                      name: page.name,
+                      access_token: page.access_token,
+                      category: page.category,
+                    }));
 
-                    // Lưu page access token vào localStorage
-                    localStorage.setItem("fb_page", JSON.stringify({page, pageID, pageAccessToken }));
+                    // Lưu page vào localStorage nếu cần
+                    localStorage.setItem("fb_pages", JSON.stringify(pages));
 
-                    // 👉 Gửi thông tin user + page về server
-                    await saveUser(userID, accessToken, userInfo, pageID, pageAccessToken);
+                    // 👉 Gửi user + tất cả pages về server
+                    await saveUser(userID, accessToken, userInfo, pages);
                     window.location.reload();
                   } else {
                     alert("Bạn chưa quản lý trang nào.");
@@ -115,8 +106,7 @@ export default function Header() {
     userID: string,
     accessToken: string,
     userInfo: any,
-    pageID: string,
-    pageAccessToken: string
+    pages: any[]
   ) => {
     setLoading(true);
     try {
@@ -126,7 +116,7 @@ export default function Header() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userID, accessToken, userInfo, pageID, pageAccessToken }),
+        body: JSON.stringify({ userID, accessToken, userInfo, pages }),
       });
 
       if (!res.ok) throw new Error("Server login failed");
@@ -139,12 +129,11 @@ export default function Header() {
     }
   };
 
-  // Đăng xuất Facebook
   const handleLogout = () => {
     window.FB.logout(() => {
       setUser(null);
       localStorage.removeItem("fb_user");
-      localStorage.removeItem("fb_page"); // Xóa thông tin page token khi đăng xuất
+      localStorage.removeItem("fb_pages");
       window.location.reload();
     });
   };
