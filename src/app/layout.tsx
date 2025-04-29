@@ -18,11 +18,11 @@ export default function RootLayout({
         <title>Messenger Chat UI</title>
       </head>
       <body>
-        <main className="h-screen bg-blue-300 flex flex-col">
+        <main id="main" className="h-[1211px] flex flex-col">
           <Header />
           <div className="flex flex-1">
             <Sidebar isOpen={isSidebarOpen} toggle={() => setIsSidebarOpen(!isSidebarOpen)} />
-            <div className="flex-1 bg-blue-100 p-4">
+            <div id="children" className="h-[1211px] flex-1 bg-blue-100 p-4">
               {children}
             </div>
           </div>

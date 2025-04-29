@@ -15,7 +15,7 @@ export default function Sidebar({ isOpen, toggle }: SidebarProps) {
     return (
         <div
             id="sidebar"
-            className={`transition-all duration-300 bg-gray-800 text-white p-4 h-[1212px] ${
+            className={`transition-all duration-300 bg-gray-800 text-white p-4 h-[1211px] ${
                 isOpen ? "w-64" : "w-20 overflow-hidden"
             }`}
         >
