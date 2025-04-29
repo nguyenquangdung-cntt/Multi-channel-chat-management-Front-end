@@ -1,19 +1,18 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 
-// Định nghĩa rõ kiểu dữ liệu
 type Message = { from: "user" | "bot"; text: string };
 type Messages = { [userId: string]: Message[] };
+type Page = { id: string; name: string };
 
-// Danh sách user mẫu
+// Fake danh sách user
 const mockUsers = [
   { id: "1234567890", name: "Alice" },
   { id: "0987654321", name: "Bob" },
 ];
 
-// Tin nhắn mẫu ban đầu
 const initialMessages: Messages = {
   "1234567890": [{ from: "bot", text: "Hello! How can I help you?" }],
   "0987654321": [{ from: "bot", text: "Hi! Need support?" }],
@@ -23,13 +22,23 @@ export default function Page() {
   const [selectedUser, setSelectedUser] = useState<typeof mockUsers[0]>(mockUsers[0]);
   const [messages, setMessages] = useState<Messages>(initialMessages);
   const [input, setInput] = useState("");
-  const [userID, setUserID] = useState("111111111111"); // ID người gửi - sau này lấy từ backend
+  const [userID, setUserID] = useState("111111111111");
+  const [pages, setPages] = useState<Page[]>([]);
+  const [selectedPage, setSelectedPage] = useState<Page | null>(null);
+
+  useEffect(() => {
+    const storedPages = localStorage.getItem("fb_page");
+    if (storedPages) {
+      const parsed = JSON.parse(storedPages);
+      setPages(parsed);
+      setSelectedPage(parsed[0] || null);
+    }
+  }, []);
 
   const handleSend = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() || !selectedPage) return;
 
     const userMessage: Message = { from: "user", text: input };
-
     const updated: Messages = {
       ...messages,
       [selectedUser.id]: [userMessage, ...(messages[selectedUser.id] || [])],
@@ -44,16 +53,16 @@ export default function Page() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userID: userID,
+          userID,
           recipientId: selectedUser.id,
           message: input,
+          pageID: selectedPage.id,
         }),
       });
 
       const data = await res.json();
       if (data.error) throw new Error(data.error);
 
-      // Phản hồi hệ thống
       setMessages((prev) => ({
         ...prev,
         [selectedUser.id]: [
@@ -81,8 +90,10 @@ export default function Page() {
           <input
             type="text"
             placeholder="Search users..."
-            className="w-full px-4 py-1.5 pr-12 border border-gray-300 rounded-full outline-none focus:ring-2 focus:ring-blue-400"
+            className="w-full px-4 py-1.5 pr-28 border border-gray-300 rounded-full outline-none focus:ring-2 focus:ring-blue-400"
           />
+
+          {/* Nút search */}
           <button
             type="button"
             className="absolute right-[3px] top-1/2 transform -translate-y-1/2 w-7 h-7 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-700 transition cursor-pointer"
@@ -91,6 +102,24 @@ export default function Page() {
           </button>
         </div>
 
+          {/* Dropdown chọn Page */}
+          {pages.length > 0 && (
+            <select
+              value={selectedPage?.id || ""}
+              onChange={(e) => {
+                const page = pages.find((p) => p.id === e.target.value);
+                setSelectedPage(page || null);
+              }}
+              className="absolute right-10 top-1/2 transform -translate-y-1/2 bg-white border border-gray-300 rounded-full text-sm h-7 px-2 outline-none"
+            >
+              {pages.map((page) => (
+                <option key={page.id} value={page.id}>
+                  {page.name}
+                </option>
+              ))}
+            </select>
+          )}
+        {/* Danh sách user */}
         {mockUsers.map((user) => (
           <div
             key={user.id}
