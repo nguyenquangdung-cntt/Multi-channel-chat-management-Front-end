@@ -28,25 +28,33 @@ export default function Page() {
 
   useEffect(() => {
     const storedPages = localStorage.getItem("fb_pages");
+    const storedUser = localStorage.getItem("fb_user");
+  
     if (storedPages) {
-      const parsed = JSON.parse(storedPages);
-      setPages(parsed);
-      setSelectedPage(parsed[0] || null);
+      const parsedPages = JSON.parse(storedPages);
+      setPages(parsedPages);
+      setSelectedPage(parsedPages[0] || null);
+    }
+  
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      setUserID(user.id); // lấy userID thật từ FB
     }
   }, []);
+  
 
   const handleSend = async () => {
     if (!input.trim() || !selectedPage) return;
-
-    const userMessage: Message = { from: "user", text: input };
-    const updated: Messages = {
-      ...messages,
-      [selectedUser.id]: [userMessage, ...(messages[selectedUser.id] || [])],
-    };
-
-    setMessages(updated);
+  
+    const newMessage: Message = { from: "user", text: input };
+  
+    setMessages((prev) => ({
+      ...prev,
+      [selectedUser.id]: [newMessage, ...(prev[selectedUser.id] || [])],
+    }));
+  
     setInput("");
-
+  
     try {
       const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
       const res = await fetch(`${API_URL}/api/facebook-auth/send-message`, {
@@ -59,10 +67,11 @@ export default function Page() {
           pageID: selectedPage.id,
         }),
       });
-
+  
       const data = await res.json();
-      if (data.error) throw new Error(data.error);
-
+      if (!res.ok || data.error) throw new Error(data.error || "Send failed");
+  
+      // bot phản hồi giả lập
       setMessages((prev) => ({
         ...prev,
         [selectedUser.id]: [
@@ -70,8 +79,7 @@ export default function Page() {
           ...prev[selectedUser.id],
         ],
       }));
-    } catch (error: any) {
-      console.error("Send message error:", error.message);
+    } catch (err: any) {
       setMessages((prev) => ({
         ...prev,
         [selectedUser.id]: [
@@ -79,9 +87,10 @@ export default function Page() {
           ...prev[selectedUser.id],
         ],
       }));
+      console.error("Send failed:", err.message);
     }
   };
-
+  
   return (
     <div id="content-chat" className="flex h-[1180px] w-full">
       {/* Sidebar */}
@@ -103,21 +112,21 @@ export default function Page() {
             ))}
           </select>
         )}
-        <div className="relative mb-4">
+        {/* <div className="relative mb-4">
           <input
             type="text"
             placeholder="Search users..."
             className="w-full px-4 py-1.5 pr-28 border border-gray-300 rounded-full outline-none focus:ring-2 focus:ring-blue-400"
-          />
+          /> */}
 
           {/* Nút search */}
-          <button
+          {/* <button
             type="button"
             className="absolute right-[3px] top-1/2 transform -translate-y-1/2 w-7 h-7 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-700 transition cursor-pointer"
           >
             <FontAwesomeIcon icon={faMagnifyingGlass} className="text-white text-sm" />
           </button>
-        </div>
+        </div> */}
         {/* Danh sách user */}
         {mockUsers.map((user) => (
           <div
