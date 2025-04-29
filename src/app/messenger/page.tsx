@@ -94,10 +94,10 @@ export default function Page() {
               const page = pages.find((p) => p.id === e.target.value);
               setSelectedPage(page || null);
             }}
-            className="bg-white border border-gray-300 rounded-full text-sm h-7 px-2"
+            className="bg-white border border-gray-300 rounded text-sm h-10 px-2 w-full"
           >
             {pages.map((page) => (
-              <option key={page.id} value={page.id}>
+              <option className="p-4" key={page.id} value={page.id}>
                 {page.name}
               </option>
             ))}
