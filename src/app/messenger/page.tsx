@@ -38,22 +38,23 @@ export default function Page() {
   useEffect(() => {
     const fetchSenders = async () => {
       if (!userID || !selectedPage) return;
-
+  
       try {
         const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
         const res = await fetch(`${API_URL}/api/facebook-auth/${userID}/${selectedPage.id}/senders`);
         const data = await res.json();
-
+        console.log("Fetched senders:", data);
+  
         const newUsers: User[] = [];
         const newMessages: Messages = {};
-
+  
         for (const sender of data) {
           if (sender.id) {
             newUsers.push({ id: sender.id, name: sender.name || `User ${sender.id}` });
             newMessages[sender.id] = sender.messages || [];
           }
         }
-
+  
         setUsers(newUsers);
         setMessages(newMessages);
         if (newUsers.length > 0) setSelectedUser(newUsers[0]);
@@ -61,9 +62,10 @@ export default function Page() {
         console.error("Failed to fetch senders with messages:", error);
       }
     };
-
+  
     fetchSenders();
   }, [selectedPage, userID]);
+   
 
   const handleSend = async () => {
     if (!input.trim() || !selectedPage || !selectedUser) return;
@@ -133,22 +135,19 @@ export default function Page() {
           </select>
         )}
 
-        {/* Filtered users: only those who sent messages */}
-        {users
-          .filter((user) => messages[user.id]?.some((msg) => msg.from === "user"))
-          .map((user) => (
-            <div
-              key={user.id}
-              onClick={() => setSelectedUser(user)}
-              className={`p-2 px-4 rounded-r-[50px] cursor-pointer ${
-                selectedUser?.id === user.id
-                  ? "bg-blue-700 text-white"
-                  : "hover:bg-blue-200"
-              }`}
-            >
-              {user.name}
-            </div>
-          ))}
+        {users.map((user) => (
+          <div
+            key={user.id}
+            onClick={() => setSelectedUser(user)}
+            className={`p-2 px-4 rounded-r-[50px] cursor-pointer ${
+              selectedUser?.id === user.id
+                ? "bg-blue-700 text-white"
+                : "hover:bg-blue-200"
+            }`}
+          >
+            {user.name}
+          </div>
+        ))}
       </aside>
 
       {/* Main Chat */}
