@@ -83,11 +83,19 @@ export default function Header() {
                       category: page.category,
                     }));
 
-                    // Lưu page vào localStorage nếu cần
-                    localStorage.setItem("fb_pages", JSON.stringify(pages));
-
                     // 👉 Gửi user + tất cả pages về server
                     await saveUser(userID, accessToken, userInfo, pages);
+
+                    // ✅ Cập nhật localStorage
+                    localStorage.setItem("fb_user", JSON.stringify(userInfo));
+                    localStorage.setItem("fb_pages", JSON.stringify(pages));
+
+                    // ✅ Cập nhật UI
+                    setUser(userInfo);
+
+                    // ✅ Đóng modal login
+                    setIsModalOpen(false);
+                    window.location.reload();
                   } else {
                     alert("Bạn chưa quản lý trang nào.");
                   }

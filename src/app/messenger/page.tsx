@@ -43,7 +43,6 @@ export default function Page() {
         const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
         const res = await fetch(`${API_URL}/api/facebook-auth/${userID}/${selectedPage.id}/senders`);
         const data = await res.json();
-        console.log("Fetched senders:", data);
 
         const fanpageId = selectedPage.id;
         const newUsers: User[] = [];
@@ -69,9 +68,8 @@ export default function Page() {
         }
 
         setUsers(newUsers);
-        console.log("Users:", newUsers);
         setMessages(newMessages);
-        if (newUsers.length > 0) setSelectedUser(newUsers[0]);
+        if (newUsers.length > 0 && !selectedUser) setSelectedUser(newUsers[0]);
       } catch (error) {
         console.error("Failed to fetch senders with messages:", error);
       }
@@ -167,7 +165,7 @@ export default function Page() {
       <main className="flex-1 flex flex-col bg-white">
         {selectedUser && (
           <div className="p-4 font-semibold text-lg bg-blue-700 text-white">
-            Chat with {selectedUser.name}
+            {selectedUser.name}
           </div>
         )}
 
