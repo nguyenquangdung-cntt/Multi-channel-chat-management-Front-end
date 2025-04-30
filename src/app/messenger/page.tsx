@@ -1,25 +1,18 @@
 "use client";
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPaperPlane, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 
+type User = { id: string; name: string };
 type Message = { from: "user" | "bot"; text: string };
 type Messages = { [userId: string]: Message[] };
 type Page = { id: string; name: string };
 
-// Fake danh sách user
-const mockUsers = [
-  { id: "1234567890", name: "Alice" },
-  { id: "0987654321", name: "Bob" },
-];
-
-const initialMessages: Messages = {
-  "1234567890": [{ from: "bot", text: "Hello! How can I help you?" }],
-  "0987654321": [{ from: "bot", text: "Hi! Need support?" }],
-};
+const initialMessages: Messages = {};
 
 export default function Page() {
-  const [selectedUser, setSelectedUser] = useState<typeof mockUsers[0]>(mockUsers[0]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [messages, setMessages] = useState<Messages>(initialMessages);
   const [input, setInput] = useState("");
   const [userID, setUserID] = useState("111111111111");
@@ -29,32 +22,60 @@ export default function Page() {
   useEffect(() => {
     const storedPages = localStorage.getItem("fb_pages");
     const storedUser = localStorage.getItem("fb_user");
-  
+
     if (storedPages) {
       const parsedPages = JSON.parse(storedPages);
       setPages(parsedPages);
       setSelectedPage(parsedPages[0] || null);
     }
-  
+
     if (storedUser) {
       const user = JSON.parse(storedUser);
-      setUserID(user.id); // lấy userID thật từ FB
+      setUserID(user.id);
     }
   }, []);
-  
+
+  useEffect(() => {
+    const fetchSenders = async () => {
+      if (!userID || !selectedPage) return;
+
+      try {
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+        const res = await fetch(`${API_URL}/api/facebook-auth/${userID}/${selectedPage.id}/senders`);
+        const data = await res.json();
+
+        const uniqueSenders: Record<string, User> = {};
+        for (const convo of data) {
+          for (const sender of convo.senders) {
+            if (sender.id && !uniqueSenders[sender.id]) {
+              uniqueSenders[sender.id] = { id: sender.id, name: sender.name || `User ${sender.id}` };
+            }
+          }
+        }
+
+        const senderList = Object.values(uniqueSenders);
+        setUsers(senderList);
+        if (senderList.length > 0) setSelectedUser(senderList[0]);
+      } catch (error) {
+        console.error("Failed to fetch senders:", error);
+      }
+    };
+
+    fetchSenders();
+  }, [selectedPage, userID]);
 
   const handleSend = async () => {
-    if (!input.trim() || !selectedPage) return;
-  
+    if (!input.trim() || !selectedPage || !selectedUser) return;
+
     const newMessage: Message = { from: "user", text: input };
-  
+
     setMessages((prev) => ({
       ...prev,
       [selectedUser.id]: [newMessage, ...(prev[selectedUser.id] || [])],
     }));
-  
+
     setInput("");
-  
+
     try {
       const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
       const res = await fetch(`${API_URL}/api/facebook-auth/send-message`, {
@@ -67,11 +88,10 @@ export default function Page() {
           pageID: selectedPage.id,
         }),
       });
-  
+
       const data = await res.json();
       if (!res.ok || data.error) throw new Error(data.error || "Send failed");
-  
-      // bot phản hồi giả lập
+
       setMessages((prev) => ({
         ...prev,
         [selectedUser.id]: [
@@ -90,12 +110,11 @@ export default function Page() {
       console.error("Send failed:", err.message);
     }
   };
-  
+
   return (
     <div id="content-chat" className="flex h-[1180px] w-full">
       {/* Sidebar */}
       <aside className="w-64 bg-gray-100 p-4 space-y-2">
-        {/* Dropdown chọn Page */}
         {pages.length > 0 && (
           <select
             value={selectedPage?.id || ""}
@@ -112,28 +131,13 @@ export default function Page() {
             ))}
           </select>
         )}
-        {/* <div className="relative mb-4">
-          <input
-            type="text"
-            placeholder="Search users..."
-            className="w-full px-4 py-1.5 pr-28 border border-gray-300 rounded-full outline-none focus:ring-2 focus:ring-blue-400"
-          /> */}
 
-          {/* Nút search */}
-          {/* <button
-            type="button"
-            className="absolute right-[3px] top-1/2 transform -translate-y-1/2 w-7 h-7 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-700 transition cursor-pointer"
-          >
-            <FontAwesomeIcon icon={faMagnifyingGlass} className="text-white text-sm" />
-          </button>
-        </div> */}
-        {/* Danh sách user */}
-        {mockUsers.map((user) => (
+        {users.map((user) => (
           <div
             key={user.id}
             onClick={() => setSelectedUser(user)}
             className={`p-2 px-4 rounded-r-[50px] cursor-pointer ${
-              selectedUser.id === user.id
+              selectedUser?.id === user.id
                 ? "bg-blue-700 text-white"
                 : "hover:bg-blue-200"
             }`}
@@ -145,12 +149,14 @@ export default function Page() {
 
       {/* Main Chat */}
       <main className="flex-1 flex flex-col bg-white">
-        <div className="p-4 font-semibold text-lg bg-blue-700 text-white">
-          Chat with {selectedUser.name}
-        </div>
+        {selectedUser && (
+          <div className="p-4 font-semibold text-lg bg-blue-700 text-white">
+            Chat with {selectedUser.name}
+          </div>
+        )}
 
         <div className="flex-1 h-0 p-4 overflow-y-auto flex flex-col-reverse space-y-reverse space-y-2 bg-gray-50">
-          {(messages[selectedUser.id] || []).map((msg, idx) => (
+          {(selectedUser && messages[selectedUser.id])?.map((msg, idx) => (
             <div
               key={idx}
               className={`px-4 py-2 rounded-2xl max-w-[80%] break-words ${
