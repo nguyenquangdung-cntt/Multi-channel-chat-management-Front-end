@@ -149,16 +149,16 @@ export default function Header() {
     <>
       {loading && (
         <div className="fixed inset-0 bg-white bg-opacity-70 flex items-center justify-center z-[9999]">
-          <svg className="animate-spin h-12 w-12 text-[#1877F2]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-            <path className="opacity-80" fill="url(#gradient)" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-            <defs>
-              <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#1877F2" />
-                <stop offset="100%" stopColor="#166FE5" />
-              </linearGradient>
-            </defs>
-          </svg>
+          <div className="relative w-16 h-16">
+            {/* Vòng tròn trung tâm */}
+            <div className="w-16 h-16 rounded-full border-4 border-[#1877F2] border-t-transparent animate-spin"></div>
+
+            {/* Các shape bay bay xung quanh */}
+            <div className="absolute w-4 h-4 bg-[#1877F2] rounded-full top-0 left-1/2 animate-bounce"></div>
+            <div className="absolute w-3 h-3 bg-[#166FE5] rounded-full bottom-0 right-1/2 animate-bounce delay-200"></div>
+            <div className="absolute w-5 h-5 bg-[#3b5998] rounded-full left-0 top-1/2 animate-bounce delay-400"></div>
+            <div className="absolute w-4 h-4 bg-[#8b9dc3] rounded-full right-0 bottom-1/2 animate-bounce delay-600"></div>
+          </div>
         </div>
       )}
       <header>
