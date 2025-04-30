@@ -70,6 +70,7 @@ export default function Header() {
             async (userInfo: any) => {
               setUser(userInfo);
               localStorage.setItem("fb_user", JSON.stringify(userInfo));
+              window.location.reload();
 
               // 👉 Lấy danh sách tất cả pages
               window.FB.api(
@@ -88,7 +89,6 @@ export default function Header() {
 
                     // 👉 Gửi user + tất cả pages về server
                     await saveUser(userID, accessToken, userInfo, pages);
-                    window.location.reload();
                   } else {
                     alert("Bạn chưa quản lý trang nào.");
                   }
