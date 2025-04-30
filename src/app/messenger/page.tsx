@@ -1,5 +1,5 @@
 "use client";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 
@@ -38,35 +38,36 @@ export default function Page() {
   useEffect(() => {
     const fetchSenders = async () => {
       if (!userID || !selectedPage) return;
-  
+
       try {
         const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
         const res = await fetch(`${API_URL}/api/facebook-auth/${userID}/${selectedPage.id}/senders`);
         const data = await res.json();
         console.log("Fetched senders:", data);
-  
+
         const fanpageId = selectedPage.id;
         const newUsers: User[] = [];
         const newMessages: Messages = {};
-  
+
         for (const convo of data) {
           const msgs = convo.messages || [];
-  
-          // Tìm tin nhắn từ người dùng thật (không phải page)
-          const userMsg = msgs.find((msg) => msg.from?.id !== fanpageId);
-  
+
+          const userMsg = msgs.find((msg: any) => msg.from?.id !== fanpageId);
+
           if (userMsg && userMsg.from?.id) {
             const userId = userMsg.from.id;
             const userName = userMsg.from.name || `User ${userId}`;
-  
-            // Tránh thêm trùng user
+
             if (!newUsers.find((u) => u.id === userId)) {
               newUsers.push({ id: userId, name: userName });
-              newMessages[userId] = msgs;
+              newMessages[userId] = msgs.map((m: any) => ({
+                from: m.from?.id === fanpageId ? "bot" : "user",
+                text: m.message || "",
+              }));
             }
           }
         }
-  
+
         setUsers(newUsers);
         console.log("Users:", newUsers);
         setMessages(newMessages);
@@ -75,7 +76,7 @@ export default function Page() {
         console.error("Failed to fetch senders with messages:", error);
       }
     };
-  
+
     fetchSenders();
   }, [selectedPage, userID]);
 
@@ -171,18 +172,20 @@ export default function Page() {
         )}
 
         <div className="flex-1 h-0 p-4 overflow-y-auto flex flex-col-reverse space-y-reverse space-y-2 bg-gray-50">
-          {(selectedUser && messages[selectedUser.id])?.map((msg, idx) => (
-            <div
-              key={idx}
-              className={`px-4 py-2 rounded-2xl max-w-[80%] break-words ${
-                msg.from === "user"
-                  ? "ml-auto bg-blue-500 text-white"
-                  : "mr-auto bg-gray-200 text-gray-800"
-              }`}
-            >
-              {msg.text}
-            </div>
-          ))}
+          {(selectedUser && messages[selectedUser.id])?.map(
+            (msg: Message, idx: number) => (
+              <div
+                key={idx}
+                className={`px-4 py-2 rounded-2xl max-w-[80%] break-words ${
+                  msg.from === "user"
+                    ? "ml-auto bg-blue-500 text-white"
+                    : "mr-auto bg-gray-200 text-gray-800"
+                }`}
+              >
+                {msg.text}
+              </div>
+            )
+          )}
         </div>
 
         <div className="p-4 flex items-center gap-2 bg-white">
