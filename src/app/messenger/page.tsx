@@ -44,42 +44,27 @@ export default function Page() {
         const res = await fetch(`${API_URL}/api/facebook-auth/${userID}/${selectedPage.id}/senders`);
         const data = await res.json();
   
-        const uniqueSenders: Record<string, User> = {};
+        const newUsers: User[] = [];
         const newMessages: Messages = {};
   
-        for (const convo of data) {
-          for (const sender of convo.senders) {
-            if (sender.id) {
-              if (!uniqueSenders[sender.id]) {
-                uniqueSenders[sender.id] = {
-                  id: sender.id,
-                  name: sender.name || `User ${sender.id}`,
-                };
-              }
-  
-              // Lưu message nếu có
-              if (sender.message) {
-                const prev = newMessages[sender.id] || [];
-                newMessages[sender.id] = [
-                  { from: "user", text: sender.message },
-                  ...prev,
-                ];
-              }
-            }
+        for (const sender of data) {
+          if (sender.id) {
+            newUsers.push({ id: sender.id, name: sender.name || `User ${sender.id}` });
+            newMessages[sender.id] = sender.messages || [];
           }
         }
   
-        const senderList = Object.values(uniqueSenders);
-        setUsers(senderList);
+        setUsers(newUsers);
         setMessages(newMessages);
-        if (senderList.length > 0) setSelectedUser(senderList[0]);
+        if (newUsers.length > 0) setSelectedUser(newUsers[0]);
       } catch (error) {
-        console.error("Failed to fetch senders:", error);
+        console.error("Failed to fetch senders with messages:", error);
       }
     };
   
     fetchSenders();
-  }, [selectedPage, userID]);  
+  }, [selectedPage, userID]);
+  
 
   const handleSend = async () => {
     if (!input.trim() || !selectedPage || !selectedUser) return;
