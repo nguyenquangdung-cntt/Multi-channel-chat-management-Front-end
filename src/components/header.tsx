@@ -70,7 +70,6 @@ export default function Header() {
             async (userInfo: any) => {
               setUser(userInfo);
               localStorage.setItem("fb_user", JSON.stringify(userInfo));
-              window.location.reload();
 
               // 👉 Lấy danh sách tất cả pages
               window.FB.api(
