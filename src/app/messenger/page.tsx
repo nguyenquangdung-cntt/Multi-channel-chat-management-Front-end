@@ -45,18 +45,30 @@ export default function Page() {
         const data = await res.json();
         console.log("Fetched senders:", data);
   
+        const fanpageId = selectedPage.id;
         const newUsers: User[] = [];
         const newMessages: Messages = {};
   
-        for (const sender of data) {
-          if (sender.id) {
-            newUsers.push({ id: sender.id, name: sender.name || `User ${sender.id}` });
-            newMessages[sender.id] = sender.messages || [];
+        for (const convo of data) {
+          const msgs = convo.messages || [];
+  
+          // Tìm tin nhắn từ người dùng thật (không phải page)
+          const userMsg = msgs.find((msg) => msg.from?.id !== fanpageId);
+  
+          if (userMsg && userMsg.from?.id) {
+            const userId = userMsg.from.id;
+            const userName = userMsg.from.name || `User ${userId}`;
+  
+            // Tránh thêm trùng user
+            if (!newUsers.find((u) => u.id === userId)) {
+              newUsers.push({ id: userId, name: userName });
+              newMessages[userId] = msgs;
+            }
           }
         }
   
         setUsers(newUsers);
-        console.log("Fetched messages:", users);
+        console.log("Users:", newUsers);
         setMessages(newMessages);
         if (newUsers.length > 0) setSelectedUser(newUsers[0]);
       } catch (error) {
@@ -66,7 +78,6 @@ export default function Page() {
   
     fetchSenders();
   }, [selectedPage, userID]);
-   
 
   const handleSend = async () => {
     if (!input.trim() || !selectedPage || !selectedUser) return;
