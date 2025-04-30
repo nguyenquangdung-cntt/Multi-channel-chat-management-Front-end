@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 
@@ -56,6 +56,7 @@ export default function Page() {
         }
   
         setUsers(newUsers);
+        console.log("Fetched messages:", users);
         setMessages(newMessages);
         if (newUsers.length > 0) setSelectedUser(newUsers[0]);
       } catch (error) {
