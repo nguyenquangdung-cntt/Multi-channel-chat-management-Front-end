@@ -163,12 +163,6 @@ export default function Page() {
 
       {/* Main Chat */}
       <main className="flex-1 flex flex-col bg-white">
-        {selectedUser && (
-          <div className="p-4 font-semibold text-lg bg-blue-700 text-white">
-            {selectedUser.name}
-          </div>
-        )}
-
         <div className="flex-1 h-0 p-4 overflow-y-auto flex flex-col-reverse space-y-reverse space-y-2 bg-gray-50">
           {(selectedUser && messages[selectedUser.id])?.map(
             (msg: Message, idx: number) => (
