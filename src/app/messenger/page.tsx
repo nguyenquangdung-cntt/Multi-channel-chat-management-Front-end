@@ -1,25 +1,24 @@
 "use client";
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPaperPlane, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 
+type User = { id: string; name: string };
 type Message = { from: "user" | "bot"; text: string };
 type Messages = { [userId: string]: Message[] };
 type Page = { id: string; name: string };
 
-const mockUsers = [{ id: "1234567890", name: "Alice" }];
+const initialMessages: Messages = {};
 
 export default function Page() {
-  const [selectedUser, setSelectedUser] = useState<typeof mockUsers[0]>(mockUsers[0]);
-  const [messages, setMessages] = useState<Messages>({});
+  const [users, setUsers] = useState<User[]>([]);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [messages, setMessages] = useState<Messages>(initialMessages);
   const [input, setInput] = useState("");
   const [userID, setUserID] = useState("111111111111");
   const [pages, setPages] = useState<Page[]>([]);
   const [selectedPage, setSelectedPage] = useState<Page | null>(null);
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-
-  // Lấy page và userID từ localStorage
   useEffect(() => {
     const storedPages = localStorage.getItem("fb_pages");
     const storedUser = localStorage.getItem("fb_user");
@@ -36,33 +35,37 @@ export default function Page() {
     }
   }, []);
 
-  // Lấy tin nhắn thật khi chọn user
   useEffect(() => {
-    const fetchMessages = async () => {
-      if (!selectedPage || !selectedUser || !userID) return;
+    const fetchSenders = async () => {
+      if (!userID || !selectedPage) return;
 
       try {
-        const res = await fetch(
-          `${API_URL}/api/facebook-auth/${userID}/${selectedPage.id}/conversations/${selectedUser.id}/messages`
-        );
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+        const res = await fetch(`${API_URL}/api/facebook-auth/${userID}/${selectedPage.id}/senders`);
         const data = await res.json();
 
-        if (!Array.isArray(data)) throw new Error("Invalid messages response");
+        const uniqueSenders: Record<string, User> = {};
+        for (const convo of data) {
+          for (const sender of convo.senders) {
+            if (sender.id && !uniqueSenders[sender.id]) {
+              uniqueSenders[sender.id] = { id: sender.id, name: sender.name || `User ${sender.id}` };
+            }
+          }
+        }
 
-        setMessages((prev) => ({
-          ...prev,
-          [selectedUser.id]: data.reverse(), // đảo ngược để tin mới xuống dưới
-        }));
-      } catch (err) {
-        console.error("Failed to fetch messages:", err);
+        const senderList = Object.values(uniqueSenders);
+        setUsers(senderList);
+        if (senderList.length > 0) setSelectedUser(senderList[0]);
+      } catch (error) {
+        console.error("Failed to fetch senders:", error);
       }
     };
 
-    fetchMessages();
-  }, [selectedUser, selectedPage, userID]);
+    fetchSenders();
+  }, [selectedPage, userID]);
 
   const handleSend = async () => {
-    if (!input.trim() || !selectedPage) return;
+    if (!input.trim() || !selectedPage || !selectedUser) return;
 
     const newMessage: Message = { from: "user", text: input };
 
@@ -74,6 +77,7 @@ export default function Page() {
     setInput("");
 
     try {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
       const res = await fetch(`${API_URL}/api/facebook-auth/send-message`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -121,19 +125,19 @@ export default function Page() {
             className="bg-white border border-gray-300 rounded text-sm h-10 px-2 w-full"
           >
             {pages.map((page) => (
-              <option key={page.id} value={page.id}>
+              <option className="p-4" key={page.id} value={page.id}>
                 {page.name}
               </option>
             ))}
           </select>
         )}
 
-        {mockUsers.map((user) => (
+        {users.map((user) => (
           <div
             key={user.id}
             onClick={() => setSelectedUser(user)}
             className={`p-2 px-4 rounded-r-[50px] cursor-pointer ${
-              selectedUser.id === user.id
+              selectedUser?.id === user.id
                 ? "bg-blue-700 text-white"
                 : "hover:bg-blue-200"
             }`}
@@ -145,12 +149,14 @@ export default function Page() {
 
       {/* Main Chat */}
       <main className="flex-1 flex flex-col bg-white">
-        <div className="p-4 font-semibold text-lg bg-blue-700 text-white">
-          Chat with {selectedUser.name}
-        </div>
+        {selectedUser && (
+          <div className="p-4 font-semibold text-lg bg-blue-700 text-white">
+            Chat with {selectedUser.name}
+          </div>
+        )}
 
         <div className="flex-1 h-0 p-4 overflow-y-auto flex flex-col-reverse space-y-reverse space-y-2 bg-gray-50">
-          {(messages[selectedUser.id] || []).map((msg, idx) => (
+          {(selectedUser && messages[selectedUser.id])?.map((msg, idx) => (
             <div
               key={idx}
               className={`px-4 py-2 rounded-2xl max-w-[80%] break-words ${
