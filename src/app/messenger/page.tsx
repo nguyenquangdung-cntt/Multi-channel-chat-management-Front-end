@@ -4,11 +4,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import { io } from "socket.io-client";
 
-const socket = io(process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"); 
-
+const socket = io(process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000");
 
 type User = { id: string; name: string };
-type Message = { from: "user" | "bot"; text: string };
+type Message = { senderId: string; recipientId: string; pageId: string; message: string };
 type Messages = { [userId: string]: Message[] };
 type Page = { id: string; name: string };
 
@@ -27,17 +26,21 @@ export default function Page() {
   const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
+    console.log("✅ WebSocket connected:", socket.connected);
+
     socket.on("newMessage", (message) => {
+      console.log("📩 New message received:", message);
+
       setMessages((prev) => ({
         ...prev,
-        [selectedUser?.id || ""]: [...(prev[selectedUser?.id || ""] || []), message],
+        [message.recipientId]: [...(prev[message.recipientId] || []), message],
       }));
     });
-  
+
     return () => {
       socket.off("newMessage");
     };
-  }, [selectedUser]);  
+  }, []);
 
   useEffect(() => {
     const storedPages = localStorage.getItem("fb_pages");
@@ -72,15 +75,17 @@ export default function Page() {
 
         for (const convo of data) {
           const msgs = convo.messages || [];
-          const userMsg = msgs.find((msg: any) => msg.from?.id !== fanpageId);
-          if (userMsg && userMsg.from?.id) {
-            const userId = userMsg.from.id;
-            const userName = userMsg.from.name || `User ${userId}`;
+          const userMsg = msgs.find((msg: any) => msg.senderId !== fanpageId);
+          if (userMsg && userMsg.senderId) {
+            const userId = userMsg.senderId;
+            const userName = userMsg.senderName || `User ${userId}`;
             if (!newUsers.find((u) => u.id === userId)) {
               newUsers.push({ id: userId, name: userName });
               newMessages[userId] = msgs.map((m: any) => ({
-                from: m.from?.id === fanpageId ? "bot" : "user",
-                text: m.message || "",
+                senderId: m.senderId,
+                recipientId: userID,
+                pageId: pageID,
+                message: m.message || "",
               }));
             }
           }
@@ -93,77 +98,42 @@ export default function Page() {
         console.error("Failed to fetch senders with messages:", error);
       } finally {
         setLoadingUsers(false);
-        setTimeout(() => setLoadingMessages(false), 500); // nhỏ delay để nhìn thấy loading
+        setTimeout(() => setLoadingMessages(false), 500);
       }
     };
 
     fetchSenders();
   }, [selectedPage, userID]);
 
-  const handleSelectUser = (user: User) => {
-    setSelectedUser(user);
-    setLoadingMessages(true);
-    setTimeout(() => {
-      setLoadingMessages(false);
-    }, 500);
-  };
-
-  const handleSend = async () => {
+  const handleSend = () => {
     if (!input.trim() || !selectedPage || !selectedUser) return;
 
-    const newMessage: Message = { from: "user", text: input };
+    const newMessage: Message = {
+      senderId: userID,
+      recipientId: selectedUser.id,
+      pageId: selectedPage.id,
+      message: input,
+    };
 
     setMessages((prev) => ({
       ...prev,
-      [selectedUser.id]: [newMessage, ...(prev[selectedUser.id] || [])],
+      [selectedUser.id]: [...(prev[selectedUser.id] || []), newMessage],
     }));
 
+    // 🔥 Gửi tin nhắn qua WebSocket 🔥
+    socket.emit("sendMessage", newMessage);
+
     setInput("");
-
-    try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-      const res = await fetch(`${API_URL}/api/facebook-auth/send-message`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userID,
-          recipientId: selectedUser.id,
-          message: input,
-          pageID: selectedPage.id,
-        }),
-      });
-
-      const data = await res.json();
-      if (!res.ok || data.error) throw new Error(data.error || "Send failed");
-
-      setMessages((prev) => ({
-        ...prev,
-        [selectedUser.id]: [
-          { from: "bot", text: "✅ Message sent to Facebook!" },
-          ...prev[selectedUser.id],
-        ],
-      }));
-    } catch (err: any) {
-      setMessages((prev) => ({
-        ...prev,
-        [selectedUser.id]: [
-          { from: "bot", text: "❌ Failed to send message." },
-          ...prev[selectedUser.id],
-        ],
-      }));
-      console.error("Send failed:", err.message);
-    }
   };
+
   const handleTyping = () => {
     if (!isTyping) setIsTyping(true);
-  
-    // Tắt trạng thái typing sau 2 giây không gõ
+
     clearTimeout((handleTyping as any).typingTimeout);
     (handleTyping as any).typingTimeout = setTimeout(() => {
       setIsTyping(false);
     }, 2000);
   };
-  
 
   return (
     <div id="content-chat" className="flex h-[1180px] w-full">
@@ -214,58 +184,22 @@ export default function Page() {
         </div>
 
         <div className="flex-1 h-0 p-4 overflow-y-auto flex flex-col-reverse space-y-reverse space-y-2 bg-gray-50">
-          {isTyping && (
-            <div className="ml-auto bg-gray-300 text-gray-700 px-4 py-2 rounded-2xl max-w-[80%]">
-              <div className="flex items-center space-x-1">
-                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.2s]"></div>
-                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.1s]"></div>
-                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
-              </div>
-            </div>
-          )}
           {loadingMessages ? (
             [...Array(6)].map((_, i) => (
-              <div
-                key={i}
-                className={`px-4 py-2 rounded-2xl max-w-[80%] animate-pulse ${
-                  i % 2 === 0
-                    ? "ml-auto bg-blue-200"
-                    : "mr-auto bg-gray-300"
-                } h-[20px]`}
-              />
+              <div key={i} className={`px-4 py-2 rounded-2xl max-w-[80%] animate-pulse ${i % 2 === 0 ? "ml-auto bg-blue-200" : "mr-auto bg-gray-300"} h-[20px]`} />
             ))
           ) : selectedUser && messages[selectedUser.id] ? (
             messages[selectedUser.id].map((msg: Message, idx: number) => (
-              <div
-                key={idx}
-                className={`px-4 py-2 rounded-2xl max-w-[80%] break-words ${
-                  msg.from === "bot"
-                    ? "ml-auto bg-blue-500 text-white"
-                    : "mr-auto bg-gray-200 text-gray-800"
-                }`}
-              >
-                {msg.text}
+              <div key={idx} className={`px-4 py-2 rounded-2xl max-w-[80%] break-words ${msg.senderId === userID ? "ml-auto bg-blue-500 text-white" : "mr-auto bg-gray-200 text-gray-800"}`}>
+                {msg.message}
               </div>
             ))
           ) : null}
         </div>
 
         <div className="p-4 flex items-center gap-2 bg-white">
-          <input
-            type="text"
-            placeholder="Type a message..."
-            value={input}
-            onChange={(e) => {
-              setInput(e.target.value);
-              handleTyping();
-            }}
-            onKeyDown={(e) => e.key === "Enter" && handleSend()}
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-[10px] outline-none bg-gray-100 h-[50px]"
-          />
-          <button
-            onClick={handleSend}
-            className="bg-blue-700 text-white p-3 rounded-full hover:bg-blue-900 transition cursor-pointer"
-          >
+          <input type="text" placeholder="Type a message..." value={input} onChange={(e) => { setInput(e.target.value); handleTyping(); }} className="flex-1 px-4 py-2 border border-gray-300 rounded-[10px] outline-none bg-gray-100 h-[50px]" />
+          <button onClick={handleSend} className="bg-blue-700 text-white p-3 rounded-full hover:bg-blue-900 transition cursor-pointer">
             <FontAwesomeIcon icon={faPaperPlane} />
           </button>
         </div>
