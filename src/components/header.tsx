@@ -156,14 +156,11 @@ export default function Header() {
     <>
       {loading && (
         <div className="fixed inset-0 bg-white bg-opacity-70 flex items-center justify-center z-[9999]">
-          {/* Spinner với nhiều vòng tròn quay ngược nhau */}
           <div className="relative w-20 h-20 flex items-center justify-center">
             <div className="absolute w-20 h-20 rounded-full border-4 border-[#1877F2] border-t-transparent animate-spin"></div>
             <div className="absolute w-16 h-16 rounded-full border-4 border-[#166FE5] border-b-transparent animate-spin-reverse"></div>
             <div className="absolute w-12 h-12 rounded-full border-4 border-[#3b5998] border-t-transparent animate-spin"></div>
           </div>
-
-          {/* Những shape bay xung quanh màn hình */}
           <div className="absolute inset-0 overflow-hidden">
             {Array.from({ length: 6 }).map((_, i) => (
               <div
@@ -220,7 +217,7 @@ export default function Header() {
       </header>
 
       {(isModalOpen || tokenExpired) && (
-        <div className="fixed inset-0 bg-blue-900 bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 backdrop-blur-md flex items-center justify-center z-50">
           <div id="modal" className="bg-white p-6 rounded shadow-lg w-full max-w-sm">
             <div className="flex justify-between items-center mb-4">
               <FontAwesomeIcon icon={faCircleUser} className="text-[20px]"/> 
