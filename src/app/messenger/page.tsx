@@ -84,7 +84,7 @@ export default function Page() {
               newMessages[userId] = msgs.map((m: any) => ({
                 senderId: m.senderId,
                 recipientId: userID,
-                pageId: pageID,
+                pageId: selectedPage.id,
                 message: m.message || "",
               }));
             }
