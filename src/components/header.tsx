@@ -156,17 +156,25 @@ export default function Header() {
     <>
       {loading && (
         <div className="fixed inset-0 bg-white bg-opacity-70 flex items-center justify-center z-[9999]">
+          {/* Spinner với nhiều vòng tròn quay ngược nhau */}
           <div className="relative w-20 h-20 flex items-center justify-center">
             <div className="absolute w-20 h-20 rounded-full border-4 border-[#1877F2] border-t-transparent animate-spin"></div>
             <div className="absolute w-16 h-16 rounded-full border-4 border-[#166FE5] border-b-transparent animate-spin-reverse"></div>
             <div className="absolute w-12 h-12 rounded-full border-4 border-[#3b5998] border-t-transparent animate-spin"></div>
           </div>
+
+          {/* Những shape bay xung quanh màn hình */}
           <div className="absolute inset-0 overflow-hidden">
-            {Array.from({ length: 6 }).map((_, i) => (
+            {Array.from({ length: 12 }).map((_, i) => (
               <div
                 key={i}
-                className="absolute w-5 h-5 rounded-full bg-[#1877F2] opacity-75"
+                className="absolute rounded-full"
                 style={{
+                  width: `${Math.random() * 8 + 4}px`, // Kích thước từ 4px đến 12px
+                  height: `${Math.random() * 8 + 4}px`,
+                  backgroundColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(
+                    Math.random() * 255
+                  )}, ${Math.floor(Math.random() * 255)}, ${Math.random() * 0.5 + 0.5})`, // Màu ngẫu nhiên với độ đậm nhạt khác nhau
                   top: `${Math.random() * 100}%`,
                   left: `${Math.random() * 100}%`,
                   animation: `floating ${Math.random() * 4 + 2}s infinite alternate ease-in-out`,
