@@ -28,16 +28,18 @@ export default function Page() {
 
   useEffect(() => {
     socket.on("newMessage", (message) => {
+      console.log("📩 New message from WebSocket:", message);
+  
       setMessages((prev) => ({
         ...prev,
-        [selectedUser?.id || ""]: [...(prev[selectedUser?.id || ""] || []), message],
+        [message.recipientId]: [...(prev[message.recipientId] || []), message],
       }));
     });
   
     return () => {
       socket.off("newMessage");
     };
-  }, [selectedUser]);  
+  }, []);  
 
   useEffect(() => {
     const storedPages = localStorage.getItem("fb_pages");
