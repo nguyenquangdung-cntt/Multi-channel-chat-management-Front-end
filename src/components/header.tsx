@@ -156,12 +156,26 @@ export default function Header() {
     <>
       {loading && (
         <div className="fixed inset-0 bg-white bg-opacity-70 flex items-center justify-center z-[9999]">
-          <div className="relative w-16 h-16">
-            <div className="w-16 h-16 rounded-full border-4 border-[#1877F2] border-t-transparent animate-spin"></div>
-            <div className="absolute w-4 h-4 bg-[#1877F2] rounded-full top-0 left-1/2 animate-bounce"></div>
-            <div className="absolute w-3 h-3 bg-[#166FE5] rounded-full bottom-0 right-1/2 animate-bounce delay-200"></div>
-            <div className="absolute w-5 h-5 bg-[#3b5998] rounded-full left-0 top-1/2 animate-bounce delay-400"></div>
-            <div className="absolute w-4 h-4 bg-[#8b9dc3] rounded-full right-0 bottom-1/2 animate-bounce delay-600"></div>
+          {/* Spinner với nhiều vòng tròn quay ngược nhau */}
+          <div className="relative w-20 h-20 flex items-center justify-center">
+            <div className="absolute w-20 h-20 rounded-full border-4 border-[#1877F2] border-t-transparent animate-spin"></div>
+            <div className="absolute w-16 h-16 rounded-full border-4 border-[#166FE5] border-b-transparent animate-spin-reverse"></div>
+            <div className="absolute w-12 h-12 rounded-full border-4 border-[#3b5998] border-t-transparent animate-spin"></div>
+          </div>
+
+          {/* Những shape bay xung quanh màn hình */}
+          <div className="absolute inset-0 overflow-hidden">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div
+                key={i}
+                className="absolute w-5 h-5 rounded-full bg-[#1877F2] opacity-75"
+                style={{
+                  top: `${Math.random() * 100}%`,
+                  left: `${Math.random() * 100}%`,
+                  animation: `floating ${Math.random() * 4 + 2}s infinite alternate ease-in-out`,
+                }}
+              ></div>
+            ))}
           </div>
         </div>
       )}

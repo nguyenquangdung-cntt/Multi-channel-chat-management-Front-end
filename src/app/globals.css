@@ -43,3 +43,13 @@ header {
     font-size: 22px;
   }
 }
+
+@keyframes spin-reverse {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(-360deg); }
+}
+
+@keyframes floating {
+  0% { transform: translateY(0); opacity: 0.7; }
+  100% { transform: translateY(-30px); opacity: 1; }
+}
