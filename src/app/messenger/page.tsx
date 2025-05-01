@@ -2,10 +2,6 @@
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
-import { io } from "socket.io-client";
-
-const socket = io(process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"); 
-
 
 type User = { id: string; name: string };
 type Message = { from: "user" | "bot"; text: string };
@@ -25,21 +21,6 @@ export default function Page() {
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
-
-  useEffect(() => {
-    socket.on("newMessage", (message) => {
-      console.log("📩 New message from WebSocket:", message);
-  
-      setMessages((prev) => ({
-        ...prev,
-        [message.recipientId]: [...(prev[message.recipientId] || []), message],
-      }));
-    });
-  
-    return () => {
-      socket.off("newMessage");
-    };
-  }, []);  
 
   useEffect(() => {
     const storedPages = localStorage.getItem("fb_pages");
@@ -170,7 +151,7 @@ export default function Page() {
   return (
     <div id="content-chat" className="flex h-[1180px] w-full">
       {/* Sidebar */}
-      <aside className="w-64 bg-gray-100 p-4 space-y-2 overflow-y-auto">
+      <aside className="w-64 bg-gray-100 p-4 space-y-2">
         {pages.length > 0 && (
           <select
             value={selectedPage?.id || ""}
