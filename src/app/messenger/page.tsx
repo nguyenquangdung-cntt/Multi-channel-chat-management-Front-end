@@ -151,7 +151,7 @@ export default function Page() {
   return (
     <div id="content-chat" className="flex h-[1180px] w-full">
       {/* Sidebar */}
-      <aside className="w-64 bg-gray-100 p-4 space-y-2">
+      <aside className="w-64 bg-gray-100 p-4 space-y-2 overflow-y-auto">
         {pages.length > 0 && (
           <select
             value={selectedPage?.id || ""}
