@@ -2,6 +2,10 @@
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
+import { io } from "socket.io-client";
+
+const socket = io(process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"); 
+
 
 type User = { id: string; name: string };
 type Message = { from: "user" | "bot"; text: string };
@@ -21,6 +25,19 @@ export default function Page() {
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+
+  useEffect(() => {
+    socket.on("newMessage", (message) => {
+      setMessages((prev) => ({
+        ...prev,
+        [selectedUser?.id || ""]: [...(prev[selectedUser?.id || ""] || []), message],
+      }));
+    });
+  
+    return () => {
+      socket.off("newMessage");
+    };
+  }, [selectedUser]);  
 
   useEffect(() => {
     const storedPages = localStorage.getItem("fb_pages");
