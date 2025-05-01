@@ -18,6 +18,8 @@ export default function Page() {
   const [userID, setUserID] = useState("111111111111");
   const [pages, setPages] = useState<Page[]>([]);
   const [selectedPage, setSelectedPage] = useState<Page | null>(null);
+  const [loadingUsers, setLoadingUsers] = useState(false);
+  const [loadingMessages, setLoadingMessages] = useState(false);
 
   useEffect(() => {
     const storedPages = localStorage.getItem("fb_pages");
@@ -38,6 +40,8 @@ export default function Page() {
   useEffect(() => {
     const fetchSenders = async () => {
       if (!userID || !selectedPage) return;
+      setLoadingUsers(true);
+      setLoadingMessages(true);
 
       try {
         const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
@@ -50,13 +54,10 @@ export default function Page() {
 
         for (const convo of data) {
           const msgs = convo.messages || [];
-
           const userMsg = msgs.find((msg: any) => msg.from?.id !== fanpageId);
-
           if (userMsg && userMsg.from?.id) {
             const userId = userMsg.from.id;
             const userName = userMsg.from.name || `User ${userId}`;
-
             if (!newUsers.find((u) => u.id === userId)) {
               newUsers.push({ id: userId, name: userName });
               newMessages[userId] = msgs.map((m: any) => ({
@@ -69,14 +70,25 @@ export default function Page() {
 
         setUsers(newUsers);
         setMessages(newMessages);
-        if (newUsers.length > 0 && !selectedUser) setSelectedUser(newUsers[0]);
+        setSelectedUser(newUsers[0] || null);
       } catch (error) {
         console.error("Failed to fetch senders with messages:", error);
+      } finally {
+        setLoadingUsers(false);
+        setTimeout(() => setLoadingMessages(false), 500); // nhỏ delay để nhìn thấy loading
       }
     };
 
     fetchSenders();
   }, [selectedPage, userID]);
+
+  const handleSelectUser = (user: User) => {
+    setSelectedUser(user);
+    setLoadingMessages(true);
+    setTimeout(() => {
+      setLoadingMessages(false);
+    }, 500);
+  };
 
   const handleSend = async () => {
     if (!input.trim() || !selectedPage || !selectedUser) return;
@@ -146,28 +158,48 @@ export default function Page() {
           </select>
         )}
 
-        {users.map((user) => (
-          <div
-            key={user.id}
-            onClick={() => setSelectedUser(user)}
-            className={`p-2 px-4 rounded-r-[50px] cursor-pointer ${
-              selectedUser?.id === user.id
-                ? "bg-blue-700 text-white"
-                : "hover:bg-blue-200"
-            }`}
-          >
-            {user.name}
-          </div>
-        ))}
+        {loadingUsers ? (
+          [...Array(5)].map((_, i) => (
+            <div key={i} className="h-10 bg-gray-300 rounded-md animate-pulse mb-2"></div>
+          ))
+        ) : (
+          users.map((user) => (
+            <div
+              key={user.id}
+              onClick={() => handleSelectUser(user)}
+              className={`p-2 px-4 rounded-r-[50px] cursor-pointer ${
+                selectedUser?.id === user.id
+                  ? "bg-blue-700 text-white"
+                  : "hover:bg-blue-200"
+              }`}
+            >
+              {user.name}
+            </div>
+          ))
+        )}
       </aside>
 
       {/* Main Chat */}
       <main className="flex-1 flex flex-col bg-white">
-        <div className="p-4 font-semibold text-lg bg-blue-700 text-white"></div>
+        <div className="p-4 font-semibold text-lg bg-blue-700 text-white">
+          {selectedUser?.name || "Messenger"}
+        </div>
+
         <div className="flex-1 h-0 p-4 overflow-y-auto flex flex-col-reverse space-y-reverse space-y-2 bg-gray-50">
-          {(selectedUser && messages[selectedUser.id])?.map(
-            (msg: Message, idx: number) => (
-              <div  
+          {loadingMessages ? (
+            [...Array(6)].map((_, i) => (
+              <div
+                key={i}
+                className={`px-4 py-2 rounded-2xl max-w-[80%] animate-pulse ${
+                  i % 2 === 0
+                    ? "ml-auto bg-blue-200"
+                    : "mr-auto bg-gray-300"
+                } h-[20px]`}
+              />
+            ))
+          ) : selectedUser && messages[selectedUser.id] ? (
+            messages[selectedUser.id].map((msg: Message, idx: number) => (
+              <div
                 key={idx}
                 className={`px-4 py-2 rounded-2xl max-w-[80%] break-words ${
                   msg.from === "bot"
@@ -177,8 +209,8 @@ export default function Page() {
               >
                 {msg.text}
               </div>
-            )
-          )}
+            ))
+          ) : null}
         </div>
 
         <div className="p-4 flex items-center gap-2 bg-white">
