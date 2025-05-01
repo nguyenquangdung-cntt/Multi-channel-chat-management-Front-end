@@ -17,6 +17,7 @@ export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [tokenExpired, setTokenExpired] = useState(false); // ⬅️ new
 
   useEffect(() => {
     window.fbAsyncInit = function () {
@@ -56,6 +57,20 @@ export default function Header() {
     if (savedUser) {
       setUser(JSON.parse(savedUser));
     }
+
+    // 🔁 Check token every 5 minutes
+    const interval = setInterval(() => {
+      window.FB.getLoginStatus((res: any) => {
+        if (res.status !== "connected") {
+          setTokenExpired(true);
+          setUser(null);
+          localStorage.removeItem("fb_user");
+          localStorage.removeItem("fb_pages");
+        }
+      });
+    }, 5 * 60 * 1000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const handleLogin = () => {
@@ -71,7 +86,6 @@ export default function Header() {
               setUser(userInfo);
               localStorage.setItem("fb_user", JSON.stringify(userInfo));
 
-              // 👉 Lấy danh sách tất cả pages
               window.FB.api(
                 "/me/accounts",
                 async (resPages: any) => {
@@ -83,18 +97,11 @@ export default function Header() {
                       category: page.category,
                     }));
 
-                    // 👉 Gửi user + tất cả pages về server
                     await saveUser(userID, accessToken, userInfo, pages);
-
-                    // ✅ Cập nhật localStorage
-                    localStorage.setItem("fb_user", JSON.stringify(userInfo));
                     localStorage.setItem("fb_pages", JSON.stringify(pages));
-
-                    // ✅ Cập nhật UI
                     setUser(userInfo);
-
-                    // ✅ Đóng modal login
                     setIsModalOpen(false);
+                    setTokenExpired(false); // ⬅️ clear expired modal
                     window.location.reload();
                   } else {
                     alert("Bạn chưa quản lý trang nào.");
@@ -150,10 +157,7 @@ export default function Header() {
       {loading && (
         <div className="fixed inset-0 bg-white bg-opacity-70 flex items-center justify-center z-[9999]">
           <div className="relative w-16 h-16">
-            {/* Vòng tròn trung tâm */}
             <div className="w-16 h-16 rounded-full border-4 border-[#1877F2] border-t-transparent animate-spin"></div>
-
-            {/* Các shape bay bay xung quanh */}
             <div className="absolute w-4 h-4 bg-[#1877F2] rounded-full top-0 left-1/2 animate-bounce"></div>
             <div className="absolute w-3 h-3 bg-[#166FE5] rounded-full bottom-0 right-1/2 animate-bounce delay-200"></div>
             <div className="absolute w-5 h-5 bg-[#3b5998] rounded-full left-0 top-1/2 animate-bounce delay-400"></div>
@@ -161,6 +165,7 @@ export default function Header() {
           </div>
         </div>
       )}
+
       <header>
         <div className=" flex justify-between items-center py-4 px-6">
           <Link href={"/"}>
@@ -199,15 +204,21 @@ export default function Header() {
           )}
         </div>
       </header>
-      {isModalOpen && (
+
+      {(isModalOpen || tokenExpired) && (
         <div className="fixed inset-0 bg-blue-900 bg-opacity-50 flex items-center justify-center z-50">
           <div id="modal" className="bg-white p-6 rounded shadow-lg w-full max-w-sm">
             <div className="flex justify-between items-center mb-4">
-            <FontAwesomeIcon icon={faCircleUser} className="text-[20px]"/> 
-            <h2 className="text-xl font-semibold">Sign in</h2>
+              <FontAwesomeIcon icon={faCircleUser} className="text-[20px]"/> 
+              <h2 className="text-xl font-semibold">
+                {tokenExpired ? "Phiên đăng nhập đã hết hạn" : "Sign in"}
+              </h2>
               <span
                 className="text-[25px] cursor-pointer text-gray-600 hover:text-red-600"
-                onClick={() => setIsModalOpen(false)}
+                onClick={() => {
+                  setIsModalOpen(false);
+                  setTokenExpired(false);
+                }}
               >
                 ×
               </span>
@@ -216,7 +227,7 @@ export default function Header() {
               className="w-full bg-blue-600 text-white py-2 rounded cursor-pointer hover:bg-blue-700"
               onClick={handleLogin}
             >
-              <FontAwesomeIcon icon={faFacebook} className="text-white" /> Sign in with Facebook
+              <FontAwesomeIcon icon={faFacebook} className="text-white" /> Đăng nhập với Facebook
             </button>
           </div>
         </div>
