@@ -20,6 +20,7 @@ export default function Page() {
   const [selectedPage, setSelectedPage] = useState<Page | null>(null);
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [loadingMessages, setLoadingMessages] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
     const storedPages = localStorage.getItem("fb_pages");
@@ -136,6 +137,16 @@ export default function Page() {
       console.error("Send failed:", err.message);
     }
   };
+  const handleTyping = () => {
+    if (!isTyping) setIsTyping(true);
+  
+    // Tắt trạng thái typing sau 2 giây không gõ
+    clearTimeout((handleTyping as any).typingTimeout);
+    (handleTyping as any).typingTimeout = setTimeout(() => {
+      setIsTyping(false);
+    }, 2000);
+  };
+  
 
   return (
     <div id="content-chat" className="flex h-[1180px] w-full">
@@ -186,6 +197,15 @@ export default function Page() {
         </div>
 
         <div className="flex-1 h-0 p-4 overflow-y-auto flex flex-col-reverse space-y-reverse space-y-2 bg-gray-50">
+          {isTyping && (
+            <div className="mr-auto bg-gray-300 text-gray-700 px-4 py-2 rounded-2xl max-w-[80%]">
+              <div className="flex items-center space-x-1">
+                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.2s]"></div>
+                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.1s]"></div>
+                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
+              </div>
+            </div>
+          )}
           {loadingMessages ? (
             [...Array(6)].map((_, i) => (
               <div
@@ -218,7 +238,10 @@ export default function Page() {
             type="text"
             placeholder="Type a message..."
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(e) => {
+              setInput(e.target.value);
+              handleTyping();
+            }}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
             className="flex-1 px-4 py-2 border border-gray-300 rounded-[10px] outline-none bg-gray-100 h-[50px]"
           />
