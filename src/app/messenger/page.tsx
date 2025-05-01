@@ -153,20 +153,22 @@ export default function Page() {
       {/* Sidebar */}
       <aside className="w-64 bg-gray-100 p-4 space-y-2 overflow-y-auto">
         {pages.length > 0 && (
-          <select
-            value={selectedPage?.id || ""}
-            onChange={(e) => {
-              const page = pages.find((p) => p.id === e.target.value);
-              setSelectedPage(page || null);
-            }}
-            className="bg-white border border-gray-300 rounded text-sm h-10 px-2 w-full"
-          >
-            {pages.map((page) => (
-              <option className="p-4" key={page.id} value={page.id}>
-                {page.name}
-              </option>
-            ))}
-          </select>
+          <div className="sticky top-0 bg-gray-100 pb-2 z-10">
+            <select
+              value={selectedPage?.id || ""}
+              onChange={(e) => {
+                const page = pages.find((p) => p.id === e.target.value);
+                setSelectedPage(page || null);
+              }}
+              className="bg-white border border-gray-300 rounded text-sm h-10 px-2 w-full"
+            >
+              {pages.map((page) => (
+                <option className="p-4" key={page.id} value={page.id}>
+                  {page.name}
+                </option>
+              ))}
+            </select>
+          </div>
         )}
 
         {loadingUsers ? (
