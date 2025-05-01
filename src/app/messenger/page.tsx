@@ -198,7 +198,7 @@ export default function Page() {
 
         <div className="flex-1 h-0 p-4 overflow-y-auto flex flex-col-reverse space-y-reverse space-y-2 bg-gray-50">
           {isTyping && (
-            <div className="mr-auto bg-gray-300 text-gray-700 px-4 py-2 rounded-2xl max-w-[80%]">
+            <div className="ml-auto bg-gray-300 text-gray-700 px-4 py-2 rounded-2xl max-w-[80%]">
               <div className="flex items-center space-x-1">
                 <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.2s]"></div>
                 <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.1s]"></div>
