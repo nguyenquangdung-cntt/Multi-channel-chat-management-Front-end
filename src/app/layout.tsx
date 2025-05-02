@@ -4,6 +4,7 @@ import { useState } from "react";
 import "./globals.css";
 import Sidebar from "@/components/sidebar";
 import Header from "@/components/header";
+import HeaderMobile from "@/components/headerMobile";
 
 
 export default function RootLayout({
@@ -19,7 +20,13 @@ export default function RootLayout({
       </head>
       <body>
         <main id="main" className="h-[1211px] flex flex-col">
-          <Header />
+          <div className="block sm:hidden">
+            <HeaderMobile/>
+          </div>
+
+          <div className="hidden sm:block">
+            <Header />
+          </div>
           <div className="flex flex-1">
             <Sidebar isOpen={isSidebarOpen} toggle={() => setIsSidebarOpen(!isSidebarOpen)} />
             <div id="children" className="h-[1211px] flex-1 bg-blue-100 p-4">
