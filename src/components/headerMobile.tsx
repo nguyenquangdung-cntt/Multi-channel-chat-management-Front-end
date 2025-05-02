@@ -161,53 +161,53 @@ export default function HeaderMobile() {
     return (
         <>
             {/* Header Fixed Sticky */}
-            <header className="fixed top-0 left-0 w-full bg-gray-800 text-white flex justify-between items-center px-4 py-3 z-50 sm:hidden">
-            {/* Nút Hamburger */}
-            <button onClick={toggleSidebar} className="text-white text-xl border py-1 px-2 bg-blue-500 rounded">
-                <FontAwesomeIcon icon={faBars} />
-            </button>
+            <header className="fixed top-0 left-0 w-full bg-gray-800 text-white flex justify-between items-center px-4 py-3 z-50 sm:hidden border-b">
+                {/* Nút Hamburger */}
+                <button onClick={toggleSidebar} className="text-white text-xl border py-1 px-2 bg-blue-500 rounded">
+                    <FontAwesomeIcon icon={faBars} />
+                </button>
 
-            {/* Logo */}
-            <Link href={"/"}>
-                <Image src={logo} alt="Logo" width={100} height={30} className="object-contain" />
-            </Link>
+                {/* Logo */}
+                <Link href={"/"}>
+                    <Image src={logo} alt="Logo" width={100} height={30} className="object-contain" />
+                </Link>
             </header>
 
             {/* Sidebar Offcanvas */}
             <div className={`fixed top-0 left-0 w-[300px] h-full bg-gray-900 text-white transition-transform duration-300 z-50 sm:hidden ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
-            <div className="p-4 flex flex-col space-y-2">
-                {/* Nút đóng Sidebar */}
-                <button onClick={toggleSidebar} className="text-white text-xl mr-auto">
-                ✕
-                </button>
+                <div className="p-4 flex flex-col space-y-2">
+                    {/* Nút đóng Sidebar */}
+                    <button onClick={toggleSidebar} className="text-white text-xl mr-auto">
+                    ✕
+                    </button>
 
-                {/* Menu Sidebar */}
-                <ul className="space-y-4">
-                <li>
-                    <Link href="/" className="flex items-center space-x-2">
-                    <FontAwesomeIcon icon={faHouse} />
-                    <span>Dashboard</span>
-                    </Link>
-                </li>
-                <li>
-                    <Link href="/messenger" className="flex items-center space-x-2">
-                    <FontAwesomeIcon icon={faCommentDots} />
-                    <span>Messenger</span>
-                    </Link>
-                </li>
-                </ul>
+                    {/* Menu Sidebar */}
+                    <ul className="space-y-4">
+                        <li>
+                            <Link href="/" className="flex items-center space-x-2">
+                            <FontAwesomeIcon icon={faHouse} />
+                            <span>Dashboard</span>
+                            </Link>
+                        </li>
+                        <li>
+                            <Link href="/messenger" className="flex items-center space-x-2">
+                            <FontAwesomeIcon icon={faCommentDots} />
+                            <span>Messenger</span>
+                            </Link>
+                        </li>
+                    </ul>
 
-                {/* Đăng nhập / Đăng xuất */}
-                {user ? (
-                <button onClick={handleLogout} className="mt-4 bg-red-500 text-white px-4 py-2 rounded">
-                    Log out
-                </button>
-                ) : (
-                <button onClick={() => setIsModalOpen(true)} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded">
-                    <FontAwesomeIcon icon={faRightToBracket} className="mr-2" /> Sign in
-                </button>
-                )}
-            </div>
+                    {/* Đăng nhập / Đăng xuất */}
+                    {user ? (
+                    <button onClick={handleLogout} className="mt-4 bg-red-500 text-white px-4 py-2 rounded">
+                        Log out
+                    </button>
+                    ) : (
+                    <button onClick={() => setIsModalOpen(true)} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded">
+                        <FontAwesomeIcon icon={faRightToBracket} className="mr-2" /> Sign in
+                    </button>
+                    )}
+                </div>
             </div>
 
             {/* Modal Đăng nhập */}
