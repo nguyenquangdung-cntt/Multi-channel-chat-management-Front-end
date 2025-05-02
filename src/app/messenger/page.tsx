@@ -205,7 +205,7 @@ export default function Page() {
               <div
                 key={idx}
                 className={`px-4 py-2 rounded-2xl max-w-[80%] break-words ${
-                  msg.from === "bot"
+                  msg.from === "user"
                     ? "ml-auto bg-blue-500 text-white"
                     : "mr-auto bg-gray-200 text-gray-800"
                 }`}
