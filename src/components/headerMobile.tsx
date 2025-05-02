@@ -203,28 +203,35 @@ export default function HeaderMobile() {
                 </Link>
             </header>
 
-            {/* Sidebar Offcanvas */}
             <div className={`fixed top-0 left-0 w-[300px] h-full bg-gray-900 text-white transition-transform duration-300 z-50 sm:hidden ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
-                <div className="p-4 flex flex-col space-y-2">
+                <div className="p-4 flex flex-col space-y-4">
                     {/* Nút đóng Sidebar */}
                     <button onClick={toggleSidebar} className="text-white text-xl mr-auto">
                     ✕
                     </button>
 
+                    {/* Avatar + Tên người dùng */}
+                    {user && (
+                    <div className="flex items-center space-x-3 border-b border-gray-700 pb-4">
+                        <img src={user.picture?.data?.url} alt="User Avatar" className="w-12 h-12 rounded-full border border-gray-600" />
+                        <span className="text-lg font-semibold">{user.name}</span>
+                    </div>
+                    )}
+
                     {/* Menu Sidebar */}
                     <ul className="space-y-4">
-                        <li>
-                            <Link href="/" className="flex items-center space-x-2">
-                            <FontAwesomeIcon icon={faHouse} />
-                            <span>Dashboard</span>
-                            </Link>
-                        </li>
-                        <li>
-                            <Link href="/messenger" className="flex items-center space-x-2">
-                            <FontAwesomeIcon icon={faCommentDots} />
-                            <span>Messenger</span>
-                            </Link>
-                        </li>
+                    <li>
+                        <Link href="/" className="flex items-center space-x-2">
+                        <FontAwesomeIcon icon={faHouse} />
+                        <span>Dashboard</span>
+                        </Link>
+                    </li>
+                    <li>
+                        <Link href="/messenger" className="flex items-center space-x-2">
+                        <FontAwesomeIcon icon={faCommentDots} />
+                        <span>Messenger</span>
+                        </Link>
+                    </li>
                     </ul>
 
                     {/* Đăng nhập / Đăng xuất */}
@@ -238,7 +245,7 @@ export default function HeaderMobile() {
                     </button>
                     )}
                 </div>
-            </div>
+                </div>
 
             {/* Modal Đăng nhập */}
             {(isModalOpen || tokenExpired) && (
