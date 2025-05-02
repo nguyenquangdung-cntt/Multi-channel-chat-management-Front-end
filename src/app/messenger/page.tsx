@@ -195,8 +195,8 @@ export default function Page() {
                 key={i}
                 className={`px-4 py-2 rounded-2xl max-w-[80%] animate-pulse ${
                   i % 2 === 0
-                    ? "ml-auto bg-blue-200"
-                    : "mr-auto bg-gray-300"
+                    ? "mr-auto bg-blue-200"
+                    : "ml-auto bg-gray-300"
                 } h-[20px]`}
               />
             ))
