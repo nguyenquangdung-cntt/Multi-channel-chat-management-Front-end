@@ -160,6 +160,36 @@ export default function HeaderMobile() {
     };
     return (
         <>
+            {loading && (
+                <div className="fixed inset-0 bg-white bg-opacity-70 flex items-center justify-center z-[9999]">
+                    {/* Spinner với nhiều vòng tròn quay ngược nhau */}
+                    <div className="relative w-20 h-20 flex items-center justify-center">
+                        <div className="absolute w-20 h-20 rounded-full border-4 border-[#1877F2] border-t-transparent animate-spin"></div>
+                        <div className="absolute w-16 h-16 rounded-full border-4 border-[#166FE5] border-b-transparent animate-spin-reverse"></div>
+                        <div className="absolute w-12 h-12 rounded-full border-4 border-[#3b5998] border-t-transparent animate-spin"></div>
+                    </div>
+
+                    {/* Những shape bay xung quanh màn hình */}
+                    <div className="absolute inset-0 overflow-hidden">
+                        {Array.from({ length: 12 }).map((_, i) => (
+                        <div
+                            key={i}
+                            className="absolute rounded-full"    
+                            style={{
+                            width: `${Math.random() * 10 + 8}px`, // Kích thước từ 4px đến 12px
+                            height: `${Math.random() * 10 + 8}px`,
+                            backgroundColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(
+                                Math.random() * 255
+                            )}, ${Math.floor(Math.random() * 255)}, ${Math.random() * 0.5 + 0.5})`, // Màu ngẫu nhiên với độ đậm nhạt khác nhau
+                            top: `${Math.random() * 100}%`,
+                            left: `${Math.random() * 100}%`,
+                            animation: `floating ${Math.random() * 4 + 2}s infinite alternate ease-in-out`,
+                            }}
+                        ></div>
+                        ))}
+                    </div>
+                </div>
+            )}
             {/* Header Fixed Sticky */}
             <header className="fixed top-0 left-0 w-full bg-gray-800 text-white flex justify-between items-center px-4 py-3 z-50 sm:hidden border-b">
                 {/* Nút Hamburger */}
@@ -212,19 +242,19 @@ export default function HeaderMobile() {
 
             {/* Modal Đăng nhập */}
             {(isModalOpen || tokenExpired) && (
-            <div className="fixed inset-0 backdrop-blur-md backdrop-brightness-50 flex items-center justify-center z-50">
-                <div className="bg-white p-6 rounded shadow-lg w-full max-w-sm">
-                <h2 className="text-xl font-semibold text-center">
-                    {tokenExpired ? "Phiên đăng nhập đã hết hạn" : "Sign in"}
-                </h2>
-                <button onClick={handleLogin} className="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
-                    Đăng nhập với Facebook
-                </button>
-                <button onClick={() => setIsModalOpen(false)} className="mt-2 w-full text-gray-600 hover:text-red-600">
-                    ✕ Đóng
-                </button>
+                <div className="fixed inset-0 backdrop-blur-md backdrop-brightness-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded shadow-lg w-full max-w-sm">
+                    <h2 className="text-xl font-semibold text-center">
+                        {tokenExpired ? "Phiên đăng nhập đã hết hạn" : "Sign in"}
+                    </h2>
+                    <button onClick={handleLogin} className="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+                        Đăng nhập với Facebook
+                    </button>
+                    <button onClick={() => setIsModalOpen(false)} className="mt-2 w-full text-gray-600 hover:text-red-600">
+                        ✕ Đóng
+                    </button>
+                    </div>
                 </div>
-            </div>
             )}
         </>
     );
