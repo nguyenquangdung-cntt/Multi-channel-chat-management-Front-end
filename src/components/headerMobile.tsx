@@ -161,6 +161,7 @@ export default function HeaderMobile() {
         setTimeout(() => {
             router.push(path); // 🌎 Chuyển hướng sau 1.5 giây
             setLoading(false);
+            setIsSidebarOpen(false); // 🔄 Đóng sidebar sau khi chuyển hướng
         }, 1500);
     };
     return (
