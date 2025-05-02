@@ -93,50 +93,31 @@ export default function Page() {
 
   const handleSend = async () => {
     if (!input.trim() || !selectedPage || !selectedUser) return;
-
-    const newMessage: Message = { from: "user", text: input };
-
+  
+    const userMessage: Message = { from: "user", text: input };
     setMessages((prev) => ({
       ...prev,
-      [selectedUser.id]: [newMessage, ...(prev[selectedUser.id] || [])],
+      [selectedUser.id]: [userMessage, ...(prev[selectedUser.id] || [])],
     }));
-
+  
+    const currentMessage = input;
     setInput("");
-
+  
     try {
       const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-      const res = await fetch(`${API_URL}/api/facebook-auth/send-message`, {
+      await fetch(`${API_URL}/api/facebook-auth/${userID}/${selectedPage.id}/send-message`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userID,
-          recipientId: selectedUser.id,
-          message: input,
-          pageID: selectedPage.id,
+          recipientID: selectedUser.id,
+          message: currentMessage,
         }),
       });
-
-      const data = await res.json();
-      if (!res.ok || data.error) throw new Error(data.error || "Send failed");
-
-      setMessages((prev) => ({
-        ...prev,
-        [selectedUser.id]: [
-          { from: "bot", text: "✅ Message sent to Facebook!" },
-          ...prev[selectedUser.id],
-        ],
-      }));
     } catch (err: any) {
-      setMessages((prev) => ({
-        ...prev,
-        [selectedUser.id]: [
-          { from: "bot", text: "❌ Failed to send message." },
-          ...prev[selectedUser.id],
-        ],
-      }));
-      console.error("Send failed:", err.message);
+      console.error("Gửi tin nhắn thất bại:", err.message);
     }
   };
+  
   const handleTyping = () => {
     if (!isTyping) setIsTyping(true);
   

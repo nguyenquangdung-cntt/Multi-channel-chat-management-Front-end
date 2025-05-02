@@ -168,10 +168,10 @@ export default function Header() {
             {Array.from({ length: 12 }).map((_, i) => (
               <div
                 key={i}
-                className="absolute rounded-full"
+                className="absolute rounded-full"    
                 style={{
-                  width: `${Math.random() * 8 + 4}px`, // Kích thước từ 4px đến 12px
-                  height: `${Math.random() * 8 + 4}px`,
+                  width: `${Math.random() * 10 + 8}px`, // Kích thước từ 4px đến 12px
+                  height: `${Math.random() * 10 + 8}px`,
                   backgroundColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(
                     Math.random() * 255
                   )}, ${Math.floor(Math.random() * 255)}, ${Math.random() * 0.5 + 0.5})`, // Màu ngẫu nhiên với độ đậm nhạt khác nhau
