@@ -163,7 +163,7 @@ export default function HeaderMobile() {
             {/* Header Fixed Sticky */}
             <header className="fixed top-0 left-0 w-full bg-gray-800 text-white flex justify-between items-center px-4 py-3 z-50 sm:hidden">
             {/* Nút Hamburger */}
-            <button onClick={toggleSidebar} className="text-white text-xl border p-4 bg-blue-500">
+            <button onClick={toggleSidebar} className="text-white text-xl border p-2 bg-blue-500 rounded">
                 <FontAwesomeIcon icon={faBars} />
             </button>
 
@@ -177,7 +177,7 @@ export default function HeaderMobile() {
             <div className={`fixed top-0 left-0 w-[300px] h-full bg-gray-900 text-white transition-transform duration-300 z-50 sm:hidden ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
             <div className="p-4 flex flex-col space-y-2">
                 {/* Nút đóng Sidebar */}
-                <button onClick={toggleSidebar} className="text-white text-xl mb-4">
+                <button onClick={toggleSidebar} className="text-white text-xl mr-auto">
                 ✕
                 </button>
 
