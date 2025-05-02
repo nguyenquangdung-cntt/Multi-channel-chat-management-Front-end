@@ -163,7 +163,7 @@ export default function HeaderMobile() {
             {/* Header Fixed Sticky */}
             <header className="fixed top-0 left-0 w-full bg-gray-800 text-white flex justify-between items-center px-4 py-3 z-50 sm:hidden">
             {/* Nút Hamburger */}
-            <button onClick={toggleSidebar} className="text-white text-xl border p-2 px-2 bg-blue-500 rounded">
+            <button onClick={toggleSidebar} className="text-white text-xl border py-1 px-2 bg-blue-500 rounded">
                 <FontAwesomeIcon icon={faBars} />
             </button>
 
