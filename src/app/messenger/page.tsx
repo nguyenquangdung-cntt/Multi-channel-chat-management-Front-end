@@ -204,13 +204,22 @@ export default function Page() {
             messages[selectedUser.id].map((msg: Message, idx: number) => (
               <div
                 key={idx}
-                className={`px-4 py-2 rounded-2xl max-w-[80%] break-words ${
-                  msg.from === "user"
-                    ? "mr-auto bg-gray-200 text-gray-800"
-                    : "ml-auto bg-blue-500 text-white"
+                className={`flex flex-col max-w-[80%] ${
+                  msg.from === "bot" ? "ml-auto items-end" : "mr-auto items-start"
                 }`}
               >
-                {msg.text}
+                <div
+                  className={`px-4 py-2 rounded-2xl break-words ${
+                    msg.from === "user"
+                    ? "mr-auto bg-gray-200 text-gray-800"
+                    : "ml-auto bg-blue-500 text-white"
+                  }`}
+                >
+                  {msg.text}
+                </div>
+                {msg.from === "bot" && (
+                  <span className="text-xs text-gray-500 mt-1">Đã gửi</span>
+                )}
               </div>
             ))
           ) : null}
