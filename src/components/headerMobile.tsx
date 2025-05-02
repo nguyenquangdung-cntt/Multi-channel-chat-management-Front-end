@@ -1,12 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRightToBracket, faCircleUser, faBars, faHouse, faCommentDots, faRightToBracket } from '@fortawesome/free-solid-svg-icons'; 
+import { faRightToBracket, faCircleUser, faBars, faHouse, faCommentDots } from '@fortawesome/free-solid-svg-icons'; 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+// import { usePathname } from "next/navigation";
 import Image from "next/image";
-import dash from "../../public/images/logo-dash.png";
-import { faFacebook } from '@fortawesome/free-brands-svg-icons';
+// import dash from "../../public/images/logo-dash.png";
+// import { faFacebook } from '@fortawesome/free-brands-svg-icons';
 import logo from "../../public/images/logo.png";
 
 declare global {
