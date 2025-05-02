@@ -28,7 +28,9 @@ export default function RootLayout({
             <Header />
           </div>
           <div className="flex flex-1">
-            <Sidebar isOpen={isSidebarOpen} toggle={() => setIsSidebarOpen(!isSidebarOpen)} />
+            <div className="hidden sm:block">
+              <Sidebar isOpen={isSidebarOpen} toggle={() => setIsSidebarOpen(!isSidebarOpen)} />
+            </div>
             <div id="children" className="h-[1211px] flex-1 bg-blue-100 p-4">
               {children}
             </div>
