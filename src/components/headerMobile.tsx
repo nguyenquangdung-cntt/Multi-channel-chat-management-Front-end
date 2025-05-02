@@ -154,6 +154,7 @@ export default function HeaderMobile() {
         localStorage.removeItem("fb_pages");
         setIsSidebarOpen(false); // 🔄 Đóng sidebar khi đăng xuất
         setLoading(true); // 🔄 Bật trạng thái loading
+        window.location.reload(); // 🌎 Tải lại trang sau 1.5 giây
       });
     };
 
