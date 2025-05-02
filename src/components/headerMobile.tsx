@@ -152,7 +152,8 @@ export default function HeaderMobile() {
         setUser(null);
         localStorage.removeItem("fb_user");
         localStorage.removeItem("fb_pages");
-        window.location.reload();
+        setIsSidebarOpen(false); // 🔄 Đóng sidebar khi đăng xuất
+        setLoading(true); // 🔄 Bật trạng thái loading
       });
     };
 
@@ -160,8 +161,8 @@ export default function HeaderMobile() {
         setLoading(true); // 🔄 Bật trạng thái loading
         setTimeout(() => {
             router.push(path); // 🌎 Chuyển hướng sau 1.5 giây
-            setLoading(false);
             setIsSidebarOpen(false); // 🔄 Đóng sidebar sau khi chuyển hướng
+            setLoading(false);
         }, 1500);
     };
     return (
