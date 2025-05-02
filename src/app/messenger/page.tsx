@@ -21,6 +21,7 @@ export default function Page() {
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  const [showSentMessageIndex, setShowSentMessageIndex] = useState<number | null>(null);
 
   useEffect(() => {
     const storedPages = localStorage.getItem("fb_pages");
@@ -76,7 +77,7 @@ export default function Page() {
         console.error("Failed to fetch senders with messages:", error);
       } finally {
         setLoadingUsers(false);
-        setTimeout(() => setLoadingMessages(false), 500); // nhỏ delay để nhìn thấy loading
+        setTimeout(() => setLoadingMessages(false), 500);
       }
     };
 
@@ -93,16 +94,28 @@ export default function Page() {
 
   const handleSend = async () => {
     if (!input.trim() || !selectedPage || !selectedUser) return;
-  
+
     const userMessage: Message = { from: "bot", text: input };
-    setMessages((prev) => ({
-      ...prev,
-      [selectedUser.id]: [userMessage, ...(prev[selectedUser.id] || [])],
-    }));
-  
+
+    setMessages((prev) => {
+      const updated = {
+        ...prev,
+        [selectedUser.id]: [userMessage, ...(prev[selectedUser.id] || [])],
+      };
+      return updated;
+    });
+
+    // Lấy index của tin nhắn vừa gửi
+    setShowSentMessageIndex(0);
+
+    // Ẩn sau 5 giây
+    setTimeout(() => {
+      setShowSentMessageIndex(null);
+    }, 5000);
+
     const currentMessage = input;
     setInput("");
-  
+
     try {
       const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
       await fetch(`${API_URL}/api/facebook-auth/${userID}/${selectedPage.id}/send-message`, {
@@ -117,17 +130,14 @@ export default function Page() {
       console.error("Gửi tin nhắn thất bại:", err.message);
     }
   };
-  
+
   const handleTyping = () => {
     if (!isTyping) setIsTyping(true);
-  
-    // Tắt trạng thái typing sau 2 giây không gõ
     clearTimeout((handleTyping as any).typingTimeout);
     (handleTyping as any).typingTimeout = setTimeout(() => {
       setIsTyping(false);
     }, 2000);
   };
-  
 
   return (
     <div id="content-chat" className="flex h-[1180px] w-full">
@@ -194,35 +204,33 @@ export default function Page() {
               <div
                 key={i}
                 className={`px-4 py-2 rounded-2xl max-w-[80%] animate-pulse ${
-                  i % 2 === 0
-                    ? "ml-auto bg-blue-200"
-                    : "mr-auto bg-gray-300"
+                  i % 2 === 0 ? "ml-auto bg-blue-200" : "mr-auto bg-gray-300"
                 } h-[20px]`}
               />
             ))
           ) : selectedUser && messages[selectedUser.id] ? (
-              messages[selectedUser.id].map((msg: Message, idx: number) => (
+            messages[selectedUser.id].map((msg: Message, idx: number) => (
+              <div
+                key={idx}
+                className={`flex flex-col max-w-[80%] ${
+                  msg.from === "bot" ? "ml-auto items-end" : "mr-auto items-start"
+                }`}
+              >
                 <div
-                  key={idx}
-                  className={`flex flex-col max-w-[80%] ${
-                    msg.from === "bot" ? "ml-auto items-end" : "mr-auto items-start"
-                  }`}
-                >
-                  <div
-                    className={`px-4 py-2 rounded-2xl break-words ${
-                      msg.from === "user"
+                  className={`px-4 py-2 rounded-2xl break-words ${
+                    msg.from === "user"
                       ? "mr-auto bg-gray-200 text-gray-800"
                       : "ml-auto bg-blue-500 text-white"
-                    }`}
-                  >
-                    {msg.text}
-                  </div>
-                  {msg.from === "bot" && (
-                    <span className="text-xs text-gray-500 mt-1">Đã gửi</span>
-                  )}
+                  }`}
+                >
+                  {msg.text}
                 </div>
-              ))
-            ) : null}
+                {msg.from === "bot" && showSentMessageIndex === idx && (
+                  <span className="text-xs text-gray-500 mt-1">Đã gửi</span>
+                )}
+              </div>
+            ))
+          ) : null}
         </div>
 
         <div className="p-4 flex items-center gap-2 bg-white">
