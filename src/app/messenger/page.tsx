@@ -94,7 +94,7 @@ export default function Page() {
   const handleSend = async () => {
     if (!input.trim() || !selectedPage || !selectedUser) return;
   
-    const userMessage: Message = { from: "user", text: input };
+    const userMessage: Message = { from: "bot", text: input };
     setMessages((prev) => ({
       ...prev,
       [selectedUser.id]: [userMessage, ...(prev[selectedUser.id] || [])],
