@@ -3,10 +3,8 @@ import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRightToBracket, faCircleUser, faBars, faHouse, faCommentDots } from '@fortawesome/free-solid-svg-icons'; 
 import Link from "next/link";
-// import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
-// import dash from "../../public/images/logo-dash.png";
-// import { faFacebook } from '@fortawesome/free-brands-svg-icons';
 import logo from "../../public/images/logo.png";
 
 declare global {
@@ -19,9 +17,8 @@ declare global {
 export default function HeaderMobile() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
-
+    const router = useRouter();
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isOpen, setIsOpen] = useState(false);
     const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState(false);
     const [tokenExpired, setTokenExpired] = useState(false); // ⬅️ new
@@ -158,6 +155,14 @@ export default function HeaderMobile() {
         window.location.reload();
       });
     };
+
+    const handleNavigation = (path: string) => {
+        setLoading(true); // 🔄 Bật trạng thái loading
+        setTimeout(() => {
+            router.push(path); // 🌎 Chuyển hướng sau 1.5 giây
+            setLoading(false);
+        }, 1500);
+    };
     return (
         <>
             {loading && (
@@ -220,18 +225,18 @@ export default function HeaderMobile() {
 
                     {/* Menu Sidebar */}
                     <ul className="space-y-4">
-                    <li>
-                        <Link href="/" className="flex items-center space-x-2">
-                        <FontAwesomeIcon icon={faHouse} />
-                        <span>Dashboard</span>
-                        </Link>
-                    </li>
-                    <li>
-                        <Link href="/messenger" className="flex items-center space-x-2">
-                        <FontAwesomeIcon icon={faCommentDots} />
-                        <span>Messenger</span>
-                        </Link>
-                    </li>
+                        <li>
+                            <button onClick={() => handleNavigation("/")} className="flex items-center space-x-2 w-full text-left">
+                                <FontAwesomeIcon icon={faHouse} />
+                                <span>Dashboard</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button onClick={() => handleNavigation("/messenger")} className="flex items-center space-x-2 w-full text-left">
+                                <FontAwesomeIcon icon={faCommentDots} />
+                                <span>Messenger</span>
+                            </button>
+                        </li>
                     </ul>
 
                     {/* Đăng nhập / Đăng xuất */}
