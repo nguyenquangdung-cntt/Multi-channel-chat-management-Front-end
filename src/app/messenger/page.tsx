@@ -196,6 +196,38 @@ export default function Page() {
           )}
         </div>
       </div>
+      {selectedUser && (
+        <main className="flex-1 flex flex-col bg-white sm:hidden">
+          <div className="p-4 font-semibold text-lg bg-blue-700 text-white">
+            {selectedUser.name}
+          </div>
+
+          <div className="flex-1 h-0 p-4 overflow-y-auto bg-gray-50">
+            <div ref={messagesEndRef} />
+            {messages[selectedUser.id]?.map((msg: Message, idx: number) => (
+              <div key={idx} className={`px-4 py-2 rounded max-w-[80%] break-words ${msg.from === "user" ? "bg-gray-200" : "bg-blue-500 text-white"} my-1`}>
+                {msg.text}
+              </div>
+            ))}
+          </div>
+
+          <div className="p-4 flex items-center gap-2 bg-white">
+            <input
+              type="text"
+              placeholder="Type a message..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              className="flex-1 px-4 py-2 border border-gray-300 rounded bg-gray-100 h-10"
+            />
+            <button
+              onClick={handleSend}
+              className="bg-blue-700 text-white p-3 rounded-full hover:bg-blue-900 transition"
+            >
+              <FontAwesomeIcon icon={faPaperPlane} />
+            </button>
+          </div>
+        </main>
+      )}
       {/* Sidebar */}
       <aside className="hidden sm:block w-64 bg-gray-100 p-4 space-y-2 overflow-y-auto">
         {pages.length > 0 && (
