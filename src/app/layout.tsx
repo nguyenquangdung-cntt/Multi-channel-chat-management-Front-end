@@ -19,7 +19,7 @@ export default function RootLayout({
         <title>Messenger Chat UI</title>
       </head>
       <body>
-        <main id="main" className="h-[1211px] flex flex-col">
+        <main id="main" className="sm:h-[1211px] h-screen flex flex-col">
           <div className="block sm:hidden">
             <HeaderMobile/>
           </div>
@@ -31,7 +31,7 @@ export default function RootLayout({
             <div className="hidden sm:block">
               <Sidebar isOpen={isSidebarOpen} toggle={() => setIsSidebarOpen(!isSidebarOpen)} />
             </div>
-            <div id="children" className="sm:h-[1211px] h-screen flex-1 bg-blue-100 p-4">
+            <div id="children" className="sm:h-[1211px] h-screen flex-1 bg-blue-100 sm:p-4 px-4">
               {children}
             </div>
           </div>
