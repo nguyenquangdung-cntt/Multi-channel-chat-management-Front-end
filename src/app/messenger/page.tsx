@@ -197,7 +197,7 @@ export default function Page() {
         </div>
       </div>
       {/* Sidebar */}
-      <aside className="hidden sm:flex w-64 bg-gray-100 p-4 space-y-2 overflow-y-auto">
+      <aside className="hidden sm:block w-64 bg-gray-100 p-4 space-y-2 overflow-y-auto">
         {pages.length > 0 && (
           <div className="sticky top-0 bg-gray-100 pb-2 z-10">
             <select
