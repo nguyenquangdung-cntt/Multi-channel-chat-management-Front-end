@@ -31,7 +31,7 @@ export default function RootLayout({
             <div className="hidden sm:block">
               <Sidebar isOpen={isSidebarOpen} toggle={() => setIsSidebarOpen(!isSidebarOpen)} />
             </div>
-            <div id="children" className="h-[1211px] flex-1 bg-blue-100 p-4">
+            <div id="children" className="sm:h-[1211px] h-screen flex-1 bg-blue-100 p-4">
               {children}
             </div>
           </div>
