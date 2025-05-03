@@ -158,8 +158,46 @@ export default function Page() {
 
   return (
     <div id="content-chat" className="flex h-[1180px] w-full">
+      {/* 📌 Mobile: Dropdown + User List */}
+      <div className="w-full p-4 bg-gray-100 sm:hidden">
+        {pages.length > 0 && (
+          <select
+            value={selectedPage?.id || ""}
+            onChange={(e) => {
+              const page = pages.find((p) => p.id === e.target.value);
+              setSelectedPage(page || null);
+            }}
+            className="w-full h-10 bg-white border border-gray-300 rounded text-sm px-2"
+          >
+            {pages.map((page) => (
+              <option key={page.id} value={page.id}>{page.name}</option>
+            ))}
+          </select>
+        )}
+
+        {/* Danh sách User */}
+        <div className="overflow-y-auto mt-4">
+          {loadingUsers ? (
+            [...Array(5)].map((_, i) => (
+              <div key={i} className="h-10 bg-gray-300 rounded-md animate-pulse mb-2"></div>
+            ))
+          ) : (
+            users.map((user) => (
+              <div
+                key={user.id}
+                onClick={() => handleSelectUser(user)}
+                className={`p-2 rounded cursor-pointer ${
+                  selectedUser?.id === user.id ? "bg-blue-700 text-white" : "hover:bg-blue-200"
+                }`}
+              >
+                {user.name}
+              </div>
+            ))
+          )}
+        </div>
+      </div>
       {/* Sidebar */}
-      <aside className="w-64 bg-gray-100 p-4 space-y-2 overflow-y-auto">
+      <aside className="hidden sm:flex w-64 bg-gray-100 p-4 space-y-2 overflow-y-auto">
         {pages.length > 0 && (
           <div className="sticky top-0 bg-gray-100 pb-2 z-10">
             <select
@@ -201,7 +239,7 @@ export default function Page() {
       </aside>
 
       {/* Main Chat */}
-      <main className="flex-1 flex flex-col bg-white">
+      <main className="hidden sm:flex flex-1 flex-col bg-white">
         <div className="p-4 font-semibold text-lg bg-blue-700 text-white">
           {selectedUser?.name || "Messenger"}
         </div>
