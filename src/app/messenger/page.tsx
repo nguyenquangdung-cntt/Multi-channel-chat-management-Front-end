@@ -157,7 +157,7 @@ export default function Page() {
   }, [messages, selectedUser]);  
 
   return (
-    <div id="content-chat" className="flex h-[1180px] w-full">
+    <div id="content-chat" className="flex sm:h-[1180px] h-screen w-full mt-[50px] sm:mt-0">
       {/* 📌 Mobile: Dropdown + User List */}
       <div className="w-full p-4 bg-gray-100 sm:hidden">
         {pages.length > 0 && (
