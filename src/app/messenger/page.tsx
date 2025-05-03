@@ -157,42 +157,9 @@ export default function Page() {
   }, [messages, selectedUser]);  
 
   return (
-    <div id="content-chat" className="w-screen h-screen flex flex-col sm:flex-row">
-      {/* 📌 Mobile: Dropdown + User List (hiển thị trên mobile) */}
-      <div className="w-full p-4 bg-gray-100 sm:hidden">
-        {pages.length > 0 && (
-          <select
-            value={selectedPage?.id || ""}
-            onChange={(e) => {
-              const page = pages.find((p) => p.id === e.target.value);
-              setSelectedPage(page || null);
-            }}
-            className="w-full h-10 bg-white border border-gray-300 rounded text-sm px-2"
-          >
-            {pages.map((page) => (
-              <option key={page.id} value={page.id}>{page.name}</option>
-            ))}
-          </select>
-        )}
-
-        {/* Danh sách User */}
-        <div className="overflow-y-auto mt-4">
-          {users.map((user) => (
-            <div
-              key={user.id}
-              onClick={() => handleSelectUser(user)}
-              className={`p-2 rounded cursor-pointer ${
-                selectedUser?.id === user.id ? "bg-blue-700 text-white" : "hover:bg-blue-200"
-              }`}
-            >
-              {user.name}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* 📌 Desktop: Sidebar (hiển thị khi màn hình lớn hơn 426px) */}
-      <aside className="hidden sm:flex w-64 bg-gray-100 p-4 space-y-2 overflow-y-auto">
+    <div id="content-chat" className="flex h-[1180px] w-full">
+      {/* Sidebar */}
+      <aside className="w-64 bg-gray-100 p-4 space-y-2 overflow-y-auto">
         {pages.length > 0 && (
           <div className="sticky top-0 bg-gray-100 pb-2 z-10">
             <select
@@ -204,58 +171,111 @@ export default function Page() {
               className="bg-white border border-gray-300 rounded text-sm h-10 px-2 w-full"
             >
               {pages.map((page) => (
-                <option key={page.id} value={page.id}>{page.name}</option>
+                <option className="p-4" key={page.id} value={page.id}>
+                  {page.name}
+                </option>
               ))}
             </select>
           </div>
         )}
 
-        {users.map((user) => (
-          <div
-            key={user.id}
-            onClick={() => handleSelectUser(user)}
-            className={`p-2 px-4 rounded cursor-pointer ${
-              selectedUser?.id === user.id ? "bg-blue-700 text-white" : "hover:bg-blue-200"
-            }`}
-          >
-            {user.name}
-          </div>
-        ))}
+        {loadingUsers ? (
+          [...Array(5)].map((_, i) => (
+            <div key={i} className="h-10 bg-gray-300 rounded-md animate-pulse mb-2"></div>
+          ))
+        ) : (
+          users.map((user) => (
+            <div
+              key={user.id}
+              onClick={() => handleSelectUser(user)}
+              className={`p-2 px-4 rounded-r-[50px] cursor-pointer ${
+                selectedUser?.id === user.id
+                  ? "bg-blue-700 text-white"
+                  : "hover:bg-blue-200"
+              }`}
+            >
+              {user.name}
+            </div>
+          ))
+        )}
       </aside>
 
-      {/* Ô Chat (hiển thị khi User được chọn) */}
-      {selectedUser && (
-        <main className="flex-1 flex flex-col bg-white">
-          <div className="p-4 font-semibold text-lg bg-blue-700 text-white">
-            {selectedUser.name}
-          </div>
+      {/* Main Chat */}
+      <main className="flex-1 flex flex-col bg-white">
+        <div className="p-4 font-semibold text-lg bg-blue-700 text-white">
+          {selectedUser?.name || "Messenger"}
+        </div>
 
-          <div className="flex-1 h-0 p-4 overflow-y-auto bg-gray-50">
-            <div ref={messagesEndRef} />
-            {messages[selectedUser.id]?.map((msg: Message, idx: number) => (
-              <div key={idx} className={`px-4 py-2 rounded max-w-[80%] break-words ${msg.from === "user" ? "bg-gray-200" : "bg-blue-500 text-white"} my-1`}>
-                {msg.text}
+        <div className="flex-1 h-0 p-4 overflow-y-auto flex flex-col-reverse space-y-reverse space-y-2 bg-gray-50">
+          <div ref={messagesEndRef} />
+          {isTyping && (
+            <div className="ml-auto bg-gray-300 text-gray-700 px-4 py-2 rounded-2xl max-w-[80%]">
+              <div className="flex items-center space-x-1">
+                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.2s]"></div>
+                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.1s]"></div>
+                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
               </div>
-            ))}
-          </div>
+            </div>
+          )}
+          {loadingMessages ? (
+            [...Array(6)].map((_, i) => (
+              <div
+                key={i}
+                className={`px-4 py-2 rounded-2xl max-w-[80%] animate-pulse ${
+                  i % 2 === 0 ? "ml-auto bg-blue-200" : "mr-auto bg-gray-300"
+                } h-[20px]`}
+              />
+            ))
+          ) : selectedUser && messages[selectedUser.id] ? (
+              messages[selectedUser.id].map((msg: Message, idx: number) => (
+                <div
+                  key={idx}
+                  className={`flex flex-col max-w-[80%] ${
+                    msg.from === "bot" ? "ml-auto items-end" : "mr-auto items-start"
+                  }`}
+                >
+                  <div
+                    className={`px-4 py-2 rounded-2xl break-words ${
+                      msg.from === "user"
+                        ? "mr-auto bg-gray-200 text-gray-800"
+                        : "ml-auto bg-blue-500 text-white"
+                    }`}
+                  >
+                    {msg.text}
+                  </div>
+              
+                  {msg.from === "bot" && showStatusIndex === idx && (
+                    <span className="text-xs text-gray-500 mt-1">
+                      {messageStatus === "sending" && "Đang gửi..."}
+                      {messageStatus === "sent" && "Đã gửi"}
+                      {messageStatus === "error" && "Tin nhắn không gửi được"}
+                    </span>
+                  )}
+                </div>
+              ))
+            ) : null}
+        </div>
 
-          <div className="p-4 flex items-center gap-2 bg-white">
-            <input
-              type="text"
-              placeholder="Type a message..."
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded bg-gray-100 h-10"
-            />
-            <button
-              onClick={handleSend}
-              className="bg-blue-700 text-white p-3 rounded-full hover:bg-blue-900 transition"
-            >
-              <FontAwesomeIcon icon={faPaperPlane} />
-            </button>
-          </div>
-        </main>
-      )}
+        <div className="p-4 flex items-center gap-2 bg-white">
+          <input
+            type="text"
+            placeholder="Type a message..."
+            value={input}
+            onChange={(e) => {
+              setInput(e.target.value);
+              handleTyping();
+            }}
+            onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            className="flex-1 px-4 py-2 border border-gray-300 rounded-[10px] outline-none bg-gray-100 h-[50px]"
+          />
+          <button
+            onClick={handleSend}
+            className="bg-blue-700 text-white p-3 rounded-full hover:bg-blue-900 transition cursor-pointer"
+          >
+            <FontAwesomeIcon icon={faPaperPlane} />
+          </button>
+        </div>
+      </main>
     </div>
   );
 }
