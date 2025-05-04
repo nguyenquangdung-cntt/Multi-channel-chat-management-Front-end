@@ -272,7 +272,7 @@ export default function Page() {
             </div>
 
             {/* Ô nhập tin nhắn - Luôn cố định dưới */}
-            <div className="p-4 flex items-center gap-2 bg-white border-t border-gray-300 flex-none">
+            <div className="p-4 flex items-center gap-2 bg-white border-t border-gray-300 flex-none fixed bottom-0 w-full max-w-3xl">
               <input
                 type="text"
                 placeholder="Type a message..."
