@@ -596,14 +596,11 @@ export default function Page() {
             modules={[Navigation, Autoplay]}
             spaceBetween={20}
             slidesPerView={1}
-            navigation={{
-              nextEl: ".swiper-button-next-custom",
-              prevEl: ".swiper-button-prev-custom",
-            }}
+            navigation
             autoplay={{ delay: 5000, disableOnInteraction: false }}
-            className="w-[80%] max-w-md relative"
+            className="w-[80%] max-w-md"
           >
-            <SwiperSlide>
+            <SwiperSlide>làm 
               <img src={slide1.src} alt="Hình 1" className="rounded-lg shadow-md w-full object-cover" />
             </SwiperSlide>
             <SwiperSlide>
@@ -612,14 +609,6 @@ export default function Page() {
             <SwiperSlide>
               <img src={slide3.src} alt="Hình 3" className="rounded-lg shadow-md w-full object-cover" />
             </SwiperSlide>
-
-            {/* Nút điều hướng tùy chỉnh */}
-            <button className="swiper-button-prev-custom absolute left-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-gray-800 text-white flex items-center justify-center rounded-full shadow-md hover:bg-gray-600">
-              ‹
-            </button>
-            <button className="swiper-button-next-custom absolute right-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-gray-800 text-white flex items-center justify-center rounded-full shadow-md hover:bg-gray-600">
-              ›
-            </button>
           </Swiper>
 
           {/* Thông báo đăng nhập */}
