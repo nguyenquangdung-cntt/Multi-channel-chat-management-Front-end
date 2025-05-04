@@ -4,7 +4,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import { io, Socket } from "socket.io-client";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Autoplay } from "swiper/modules";
 import "swiper/css";
+import "swiper/css/navigation";
 
 type User = { id: string; name: string };
 type Message = { from: "user" | "bot"; text: string; pending?: boolean; error?: boolean };
@@ -586,16 +588,22 @@ export default function Page() {
         </>
       ) : (
         <div className="hidden flex-1 sm:flex flex-col items-center justify-center bg-gray-100">
-          {/* Slider Hình Ảnh */}
-          <Swiper spaceBetween={20} slidesPerView={1} className="w-[80%] max-w-md">
+          <Swiper
+            modules={[Navigation, Autoplay]}
+            spaceBetween={20}
+            slidesPerView={1}
+            navigation
+            autoplay={{ delay: 3000, disableOnInteraction: false }}
+            className="w-[80%] max-w-md"
+          >
             <SwiperSlide>
-              <img src="/images/img1.jpg" alt="Hình 1" className="w-full h-auto max-w-[800px] object-cover" />
+              <img src="/images/img1.jpg" alt="Hình 1" className="rounded-lg shadow-md w-full object-cover" />
             </SwiperSlide>
             <SwiperSlide>
-              <img src="/images/img2.jpg" alt="Hình 2" className="w-full h-auto max-w-[800px] object-cover" />
+              <img src="/images/img2.jpg" alt="Hình 2" className="rounded-lg shadow-md w-full object-cover" />
             </SwiperSlide>
             <SwiperSlide>
-              <img src="/images/img3.jpg" alt="Hình 3" className="w-full h-auto max-w-[800px] object-cover" />
+              <img src="/images/img3.jpg" alt="Hình 3" className="rounded-lg shadow-md w-full object-cover" />
             </SwiperSlide>
           </Swiper>
 
