@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import { io, Socket } from "socket.io-client";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
 
 type User = { id: string; name: string };
 type Message = { from: "user" | "bot"; text: string; pending?: boolean; error?: boolean };
@@ -448,8 +450,16 @@ export default function Page() {
 
               </div>
             </div>
-          )}
-
+          )}     
+        </>
+      ) : (
+        <div className="sm:hidden flex-1 flex items-center justify-center bg-gray-100">
+          <div className="h-[70px]"></div>
+          <p className="text-gray-500 text-lg">Please log in to access the chat.</p>
+        </div>
+      )}
+      {isLoggedIn ? (
+        <>
           {/* Sidebar */}
           <aside className="hidden sm:block w-64 bg-gray-100 p-4 space-y-2 overflow-y-auto">
             {pages.length > 0 && (
@@ -575,8 +585,22 @@ export default function Page() {
           </main>
         </>
       ) : (
-        <div className="flex-1 flex items-center justify-center bg-gray-100">
-          <p className="text-gray-500 text-lg">Please log in to access the chat.</p>
+        <div className="hidden flex-1 sm:flex flex-col items-center justify-center bg-gray-100">
+          {/* Slider Hình Ảnh */}
+          <Swiper spaceBetween={20} slidesPerView={1} className="w-[80%] max-w-md">
+            <SwiperSlide>
+              <img src="/images/img1.jpg" alt="Hình 1" className="w-full h-auto max-w-[800px] object-cover" />
+            </SwiperSlide>
+            <SwiperSlide>
+              <img src="/images/img2.jpg" alt="Hình 2" className="w-full h-auto max-w-[800px] object-cover" />
+            </SwiperSlide>
+            <SwiperSlide>
+              <img src="/images/img3.jpg" alt="Hình 3" className="w-full h-auto max-w-[800px] object-cover" />
+            </SwiperSlide>
+          </Swiper>
+
+          {/* Thông báo đăng nhập */}
+          <p className="text-gray-500 text-lg mt-4">Please log in to access the chat.</p>
         </div>
       )}
     </div>
