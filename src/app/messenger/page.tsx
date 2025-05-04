@@ -231,7 +231,7 @@ export default function Page() {
 
             {/* Nội dung Chat - Chỉ phần này được scroll */}
             <div className="flex-1 h-0 p-4 overflow-y-auto flex flex-col-reverse space-y-reverse space-y-2 bg-gray-50 pb-[50px]">
-              {errorMessage && (
+              {selectedUser && errorMessage && (
                 <div className="text-red-600 text-sm mt-2 self-end">
                   ⚠️ {errorMessage}
                 </div>
@@ -359,7 +359,7 @@ export default function Page() {
         </div>
 
         <div className="flex-1 h-0 p-4 overflow-y-auto flex flex-col-reverse space-y-reverse space-y-2 bg-gray-50">
-          {errorMessage && (
+          {selectedUser && errorMessage && (
             <div className="text-red-600 text-sm mt-2 self-end">
               ⚠️ {errorMessage}
             </div>
