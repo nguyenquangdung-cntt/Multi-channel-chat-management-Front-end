@@ -220,7 +220,7 @@ export default function Page() {
             </div>
 
             {/* Nội dung Chat - Chỉ phần này được scroll */}
-            <div className="flex-1 p-4 overflow-y-auto bg-gray-50">
+            <div className="flex-1 p-4 flex-col-reverse overflow-y-auto bg-gray-50">
               <div ref={messagesEndRef} />
               {isTyping && (
                 <div className="ml-auto bg-gray-300 text-gray-700 px-4 py-2 rounded-2xl max-w-[80%]">
@@ -236,7 +236,7 @@ export default function Page() {
                   <div key={i} className={`px-4 py-2 rounded-2xl max-w-[80%] animate-pulse ${i % 2 === 0 ? "ml-auto bg-blue-200" : "mr-auto bg-gray-300"} h-[20px]`} />
                 ))
               ) : selectedUser && messages[selectedUser.id] ? (
-                messages[selectedUser.id].reverse().map((msg: Message, idx: number) => (
+                messages[selectedUser.id].map((msg: Message, idx: number) => (
                   <div key={idx} className={`flex space-y-3 max-w-[80%] ${msg.from === "bot" ? "ml-auto items-end" : "mr-auto items-start"}`}>
                     <div className={`px-4 py-2 rounded-2xl space-y-3 break-words ${msg.from === "user" ? "mr-auto bg-gray-200 text-gray-800" : "ml-auto bg-blue-500 text-white"}`}>
                       {msg.text}
