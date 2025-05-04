@@ -206,88 +206,78 @@ export default function Page() {
           )}
         </div>
       </div>
-      {/* Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-white flex items-center justify-center z-50">
-          {/* Main Chat */}
-          <main className="flex flex-1 flex-col bg-white">
-            <div className="p-4 font-semibold text-lg bg-blue-700 text-white">
-              {selectedUser?.name || "Messenger"}
-            </div>
+{/* Modal */}
+{isModalOpen && (
+  <div className="fixed inset-0 bg-white flex items-center justify-center z-50">
+    <div className="relative w-full max-w-3xl bg-white rounded-lg shadow-lg flex flex-col">
+      
+      {/* Header Modal */}
+      <div className="p-4 font-semibold text-lg bg-blue-700 text-white flex justify-between items-center">
+        <span>{selectedUser?.name || "Messenger"}</span>
+        <button onClick={() => setIsModalOpen(false)} className="text-white text-2xl hover:text-red-400 transition">
+          ✕
+        </button>
+      </div>
 
-            <div className="flex-1 h-0 p-4 overflow-y-auto flex flex-col-reverse space-y-reverse space-y-2 bg-gray-50">
-              <div ref={messagesEndRef} />
-              {isTyping && (
-                <div className="ml-auto bg-gray-300 text-gray-700 px-4 py-2 rounded-2xl max-w-[80%]">
-                  <div className="flex items-center space-x-1">
-                    <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.2s]"></div>
-                    <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.1s]"></div>
-                    <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
-                  </div>
-                </div>
+      {/* Nội dung Chat */}
+      <div className="flex-1 p-4 overflow-y-auto bg-gray-50">
+        <div ref={messagesEndRef} />
+        {isTyping && (
+          <div className="ml-auto bg-gray-300 text-gray-700 px-4 py-2 rounded-2xl max-w-[80%]">
+            <div className="flex items-center space-x-1">
+              <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.2s]"></div>
+              <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.1s]"></div>
+              <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
+            </div>
+          </div>
+        )}
+        {loadingMessages ? (
+          [...Array(6)].map((_, i) => (
+            <div key={i} className={`px-4 py-2 rounded-2xl max-w-[80%] animate-pulse ${i % 2 === 0 ? "ml-auto bg-blue-200" : "mr-auto bg-gray-300"} h-[20px]`} />
+          ))
+        ) : selectedUser && messages[selectedUser.id] ? (
+          messages[selectedUser.id].map((msg: Message, idx: number) => (
+            <div key={idx} className={`flex flex-col max-w-[80%] ${msg.from === "bot" ? "ml-auto items-end" : "mr-auto items-start"}`}>
+              <div className={`px-4 py-2 rounded-2xl break-words ${msg.from === "user" ? "mr-auto bg-gray-200 text-gray-800" : "ml-auto bg-blue-500 text-white"}`}>
+                {msg.text}
+              </div>
+              {msg.from === "bot" && showStatusIndex === idx && (
+                <span className="text-xs text-gray-500 mt-1">
+                  {messageStatus === "sending" && "Đang gửi..."}
+                  {messageStatus === "sent" && "Đã gửi"}
+                  {messageStatus === "error" && "Tin nhắn không gửi được"}
+                </span>
               )}
-              {loadingMessages ? (
-                [...Array(6)].map((_, i) => (
-                  <div
-                    key={i}
-                    className={`px-4 py-2 rounded-2xl max-w-[80%] animate-pulse ${
-                      i % 2 === 0 ? "ml-auto bg-blue-200" : "mr-auto bg-gray-300"
-                    } h-[20px]`}
-                  />
-                ))
-              ) : selectedUser && messages[selectedUser.id] ? (
-                  messages[selectedUser.id].map((msg: Message, idx: number) => (
-                    <div
-                      key={idx}
-                      className={`flex flex-col max-w-[80%] ${
-                        msg.from === "bot" ? "ml-auto items-end" : "mr-auto items-start"
-                      }`}
-                    >
-                      <div
-                        className={`px-4 py-2 rounded-2xl break-words ${
-                          msg.from === "user"
-                            ? "mr-auto bg-gray-200 text-gray-800"
-                            : "ml-auto bg-blue-500 text-white"
-                        }`}
-                      >
-                        {msg.text}
-                      </div>
-                  
-                      {msg.from === "bot" && showStatusIndex === idx && (
-                        <span className="text-xs text-gray-500 mt-1">
-                          {messageStatus === "sending" && "Đang gửi..."}
-                          {messageStatus === "sent" && "Đã gửi"}
-                          {messageStatus === "error" && "Tin nhắn không gửi được"}
-                        </span>
-                      )}
-                    </div>
-                  ))
-                ) : null}
             </div>
+          ))
+        ) : null}
+      </div>
 
-            <div className="p-4 flex items-center gap-2 bg-white">
-              <input
-                type="text"
-                placeholder="Type a message..."
-                value={input}
-                onChange={(e) => {
-                  setInput(e.target.value);
-                  handleTyping();
-                }}
-                onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-[10px] outline-none bg-gray-100 h-[50px]"
-              />
-              <button
-                onClick={handleSend}
-                className="bg-blue-700 text-white p-3 rounded-full hover:bg-blue-900 transition cursor-pointer"
-              >
-                <FontAwesomeIcon icon={faPaperPlane} />
-              </button>
-            </div>
-          </main>
-          <button onClick={() => setIsModalOpen(false)} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded">Đóng</button>
-        </div>
-      )}
+      {/* Ô nhập tin nhắn */}
+      <div className="p-4 flex items-center gap-2 bg-white border-t">
+        <input
+          type="text"
+          placeholder="Type a message..."
+          value={input}
+          onChange={(e) => {
+            setInput(e.target.value);
+            handleTyping();
+          }}
+          onKeyDown={(e) => e.key === "Enter" && handleSend()}
+          className="flex-1 px-4 py-2 border border-gray-300 rounded-[10px] outline-none bg-gray-100 h-[50px]"
+        />
+        <button
+          onClick={handleSend}
+          className="bg-blue-700 text-white p-3 rounded-full hover:bg-blue-900 transition cursor-pointer"
+        >
+          <FontAwesomeIcon icon={faPaperPlane} />
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
+
       {/* Sidebar */}
       <aside className="hidden sm:block w-64 bg-gray-100 p-4 space-y-2 overflow-y-auto">
         {pages.length > 0 && (
