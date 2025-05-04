@@ -33,22 +33,21 @@ export default function Page() {
 
   const socketRef = useRef<Socket | null>(null);
 
-  
   useEffect(() => {
     if (!selectedPage) return;
-  
+
     if (!socketRef.current) {
       socketRef.current = io(API_URL);
     }
-  
+
     // Join room theo pageID
     socketRef.current.emit("join_page", selectedPage.id);
-  
+
     // Lắng nghe sự kiện new_message
     const handleNewMessage = (data: any) => {
       console.log("New message received:", data); // Debug log
       if (data.pageID !== selectedPage.id) return;
-  
+
       setMessages((prev) => {
         const arr = prev[data.recipientID] || [];
         // Tránh duplicate tin nhắn
@@ -63,23 +62,55 @@ export default function Page() {
           ],
         };
       });
-  
+
       // Tự động cuộn xuống cuối nếu đang xem đúng user
       if (selectedUser?.id === data.recipientID) {
         scrollToBottom();
       }
     };
-  
+
+    // Lắng nghe sự kiện update_conversations
+    const handleUpdateConversations = async (data: any) => {
+      if (data.pageID !== selectedPage.id) return;
+
+      // Tự động làm mới danh sách người dùng và tin nhắn
+      const res = await fetch(`${API_URL}/api/facebook-auth/${userID}/${selectedPage.id}/senders`);
+      const updatedData = await res.json();
+
+      const fanpageId = selectedPage.id;
+      const newUsers: User[] = [];
+      const newMessages: Messages = {};
+
+      for (const convo of updatedData) {
+        const msgs = convo.messages || [];
+        const userMsg = msgs.find((msg: any) => msg.from?.id !== fanpageId);
+        if (userMsg && userMsg.from?.id) {
+          const userId = userMsg.from.id;
+          const userName = userMsg.from.name || `User ${userId}`;
+          if (!newUsers.find((u) => u.id === userId)) {
+            newUsers.push({ id: userId, name: userName });
+            newMessages[userId] = msgs.map((m: any) => ({
+              from: m.from?.id === fanpageId ? "bot" : "user",
+              text: m.message || "",
+            }));
+          }
+        }
+      }
+
+      setUsers(newUsers);
+      setMessages(newMessages);
+    };
+
     socketRef.current.on("new_message", handleNewMessage);
-  
+    socketRef.current.on("update_conversations", handleUpdateConversations);
+
     return () => {
       if (socketRef.current) {
         socketRef.current.off("new_message", handleNewMessage);
+        socketRef.current.off("update_conversations", handleUpdateConversations);
       }
     };
   }, [selectedPage, selectedUser]);
-
-  
 
   useEffect(() => {
     const storedPages = localStorage.getItem("fb_pages");
@@ -95,50 +126,7 @@ export default function Page() {
       const user = JSON.parse(storedUser);
       setUserID(user.id);
     }
-  }, []);  useEffect(() => {
-    if (!selectedPage) return;
-  
-    if (!socketRef.current) {
-      socketRef.current = io(API_URL);
-    }
-  
-    // Join room theo pageID
-    socketRef.current.emit("join_page", selectedPage.id);
-  
-    // Lắng nghe sự kiện new_message
-    const handleNewMessage = (data: any) => {
-      console.log("New message received:", data); // Debug log
-      if (data.pageID !== selectedPage.id) return;
-  
-      setMessages((prev) => {
-        const arr = prev[data.recipientID] || [];
-        // Tránh duplicate tin nhắn
-        if (arr[0] && arr[0].text === data.message && arr[0].from === data.from) {
-          return prev;
-        }
-        return {
-          ...prev,
-          [data.recipientID]: [
-            { from: data.from, text: data.message },
-            ...arr,
-          ],
-        };
-      });
-  
-      // Tự động cuộn xuống cuối nếu đang xem đúng user
-      if (selectedUser?.id === data.recipientID) {
-        scrollToBottom();
-      }
-    };
-  
-    socketRef.current.on("new_message", handleNewMessage);
-  
-    return () => {
-      if (socketRef.current) {
-        socketRef.current.off("new_message", handleNewMessage);
-      }
-    };
-  }, [selectedPage, selectedUser]);
+  }, []);
 
   useEffect(() => {
     const fetchSenders = async () => {
@@ -204,9 +192,9 @@ export default function Page() {
 
   const handleSend = async () => {
     if (!input.trim() || !selectedPage || !selectedUser) return;
-  
+
     const userMessage: Message = { from: "bot", text: input };
-  
+
     setMessages((prev) => {
       const updated = {
         ...prev,
@@ -214,11 +202,11 @@ export default function Page() {
       };
       return updated;
     });
-  
+
     setInput("");
     setMessageStatus("sending");
     setShowStatusIndex(0);
-  
+
     try {
       const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
       const res = await fetch(`${API_URL}/api/facebook-auth/${userID}/${selectedPage.id}/send-message`, {
@@ -229,9 +217,9 @@ export default function Page() {
           message: userMessage.text,
         }),
       });
-  
+
       const data = await res.json();
-  
+
       if (!res.ok) {
         if (data.isOutside24hWindow) {
           setErrorMessage("Tin nhắn này được gửi ngoài khoảng thời gian cho phép (24h) và không thể gửi.Vui lòng yêu cầu người dùng nhắn tin trước.");
@@ -243,7 +231,7 @@ export default function Page() {
       } else {
         setMessageStatus("sent");
       }
-  
+
     } catch (err: any) {
       console.error("Gửi tin nhắn thất bại:", err.message);
       setMessageStatus("error");
@@ -254,7 +242,7 @@ export default function Page() {
       }, 5000);
     }
   };
-  
+
   const handleTyping = () => {
     if (!isTyping) setIsTyping(true);
     clearTimeout((handleTyping as any).typingTimeout);
@@ -266,12 +254,12 @@ export default function Page() {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
-  
+
   useEffect(() => {
     if (selectedUser && messages[selectedUser.id]) {
       scrollToBottom();
     }
-  }, [messages, selectedUser]);  
+  }, [messages, selectedUser]);
 
   return (
     <div id="content-chat" className="flex sm:h-[1180px] h-screen w-full">
