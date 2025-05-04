@@ -168,8 +168,9 @@ export default function Page() {
 
   return (
     <div id="content-chat" className="flex sm:h-[1180px] h-screen w-full">
+      <div className="sm:hidden h-[60px]"></div>
       {/* 📌 Mobile: Dropdown + User List */}
-      <div className="w-full h-screen p-4 bg-gray-100 sm:hidden">
+      <div className="w-full h-screen bg-gray-100 sm:hidden">
         {pages.length > 0 && (
           <select
             value={selectedPage?.id || ""}
@@ -177,7 +178,7 @@ export default function Page() {
               const page = pages.find((p) => p.id === e.target.value);
               setSelectedPage(page || null);
             }}
-            className="w-full h-10 bg-white border border-gray-300 rounded text-sm px-2"
+            className="w-full h-10 bg-white border border-gray-300 rounded text-sm px-2 ml-4 mr-4"
           >
             {pages.map((page) => (
               <option key={page.id} value={page.id}>{page.name}</option>
@@ -196,9 +197,7 @@ export default function Page() {
               <div
                 key={user.id}
                 onClick={() => handleSelectUserMobile(user)}
-                className={`p-2 rounded cursor-pointer ${
-                  selectedUser?.id === user.id ? "bg-blue-700 text-white" : "hover:bg-blue-200"
-                }`}
+                className="p-4 rounded cursor-pointer hover:bg-blue-200 border border-gray-300"
               >
                 {user.name}
               </div>
