@@ -231,6 +231,11 @@ export default function Page() {
 
             {/* Nội dung Chat - Chỉ phần này được scroll */}
             <div className="flex-1 h-0 p-4 overflow-y-auto flex flex-col-reverse space-y-reverse space-y-2 bg-gray-50 pb-[50px]">
+              {errorMessage && (
+                <div className="text-red-600 text-sm mt-2 self-end">
+                  ⚠️ {errorMessage}
+                </div>
+              )}
               <div ref={messagesEndRef} />
               {isTyping && (
                 <div className="ml-auto bg-gray-300 text-gray-700 px-4 py-2 rounded-2xl max-w-[80%]">
@@ -278,11 +283,6 @@ export default function Page() {
                   </div>
                 ))
               ) : null}
-              {errorMessage && (
-                <div className="text-red-600 text-sm mt-2 self-end">
-                  ⚠️ {errorMessage}
-                </div>
-              )}
             </div>
 
             {/* Ô nhập tin nhắn - Luôn cố định dưới */}
@@ -359,6 +359,11 @@ export default function Page() {
         </div>
 
         <div className="flex-1 h-0 p-4 overflow-y-auto flex flex-col-reverse space-y-reverse space-y-2 bg-gray-50">
+          {errorMessage && (
+            <div className="text-red-600 text-sm mt-2 self-end">
+              ⚠️ {errorMessage}
+            </div>
+          )}
           <div ref={messagesEndRef} />
           {isTyping && (
             <div className="ml-auto bg-gray-300 text-gray-700 px-4 py-2 rounded-2xl max-w-[80%]">
@@ -406,11 +411,6 @@ export default function Page() {
                 </div>
               ))
             ) : null}
-            {errorMessage && (
-              <div className="text-red-600 text-sm mt-2 self-end">
-                ⚠️ {errorMessage}
-              </div>
-            )}
         </div>
 
         <div className="p-4 flex items-center gap-2 bg-white">
