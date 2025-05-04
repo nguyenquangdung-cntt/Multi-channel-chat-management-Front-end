@@ -195,20 +195,17 @@ export default function Page() {
 
     const userMessage: Message = { from: "bot", text: input };
 
-    setMessages((prev) => {
-      const updated = {
-        ...prev,
-        [selectedUser.id]: [userMessage, ...(prev[selectedUser.id] || [])],
-      };
-      return updated;
-    });
+    // Add the message to the UI immediately
+    setMessages((prev) => ({
+      ...prev,
+      [selectedUser.id]: [userMessage, ...(prev[selectedUser.id] || [])],
+    }));
 
     setInput("");
     setMessageStatus("sending");
     setShowStatusIndex(0);
 
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
       const res = await fetch(`${API_URL}/api/facebook-auth/${userID}/${selectedPage.id}/send-message`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -222,7 +219,9 @@ export default function Page() {
 
       if (!res.ok) {
         if (data.isOutside24hWindow) {
-          setErrorMessage("Tin nhắn này được gửi ngoài khoảng thời gian cho phép (24h) và không thể gửi.Vui lòng yêu cầu người dùng nhắn tin trước.");
+          setErrorMessage(
+            "Tin nhắn này được gửi ngoài khoảng thời gian cho phép (24h) và không thể gửi. Vui lòng yêu cầu người dùng nhắn tin trước."
+          );
           setErrorUserId(selectedUser.id);
         } else {
           alert("❗ Gửi tin nhắn thất bại: " + (data.error || "Lỗi không xác định"));
@@ -231,7 +230,6 @@ export default function Page() {
       } else {
         setMessageStatus("sent");
       }
-
     } catch (err: any) {
       console.error("Gửi tin nhắn thất bại:", err.message);
       setMessageStatus("error");
