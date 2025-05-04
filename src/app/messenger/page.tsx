@@ -210,7 +210,7 @@ export default function Page() {
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-white flex items-center justify-center z-50 mt-[]">
-          <div className="relative w-full max-w-3xl bg-white rounded-lg shadow-lg flex flex-col h-screen pt-[25px]">
+          <div className="relative w-full max-w-3xl bg-white rounded-lg shadow-lg flex flex-col h-screen pt-[30px]">
             
             {/* Header Modal - Luôn cố định trên cùng */}
             <div className="p-4 font-semibold text-lg bg-blue-700 text-white flex justify-between items-center flex-none">
