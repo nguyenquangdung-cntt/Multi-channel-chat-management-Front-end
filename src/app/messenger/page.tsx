@@ -26,6 +26,7 @@ export default function Page() {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [errorUserId, setErrorUserId] = useState<string | null>(null);
 
   useEffect(() => {
     const storedPages = localStorage.getItem("fb_pages");
@@ -138,6 +139,7 @@ export default function Page() {
       if (!res.ok) {
         if (data.isOutside24hWindow) {
           setErrorMessage("Tin nhắn này được gửi ngoài khoảng thời gian cho phép (24h) và không thể gửi.Vui lòng yêu cầu người dùng nhắn tin trước.");
+          setErrorUserId(selectedUser.id);
         } else {
           alert("❗ Gửi tin nhắn thất bại: " + (data.error || "Lỗi không xác định"));
         }
@@ -231,7 +233,7 @@ export default function Page() {
 
             {/* Nội dung Chat - Chỉ phần này được scroll */}
             <div className="flex-1 h-0 p-4 overflow-y-auto flex flex-col-reverse space-y-reverse space-y-2 bg-gray-50 pb-[50px]">
-              {selectedUser && errorMessage && (
+              {selectedUser?.id === errorUserId && errorMessage && (
                 <div className="text-red-600 text-sm mt-2 self-end">
                   ⚠️ {errorMessage}
                 </div>
@@ -359,7 +361,7 @@ export default function Page() {
         </div>
 
         <div className="flex-1 h-0 p-4 overflow-y-auto flex flex-col-reverse space-y-reverse space-y-2 bg-gray-50">
-          {selectedUser && errorMessage && (
+          {selectedUser?.id === errorUserId && errorMessage && (
             <div className="text-red-600 text-sm mt-2 self-end">
               ⚠️ {errorMessage}
             </div>
