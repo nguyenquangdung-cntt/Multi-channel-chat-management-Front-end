@@ -168,9 +168,9 @@ export default function Page() {
 
   return (
     <div id="content-chat" className="flex sm:h-[1180px] h-screen w-full">
-      <div className="sm:hidden h-[60px]"></div>
       {/* 📌 Mobile: Dropdown + User List */}
       <div className="w-full h-screen bg-gray-100 sm:hidden">
+        <div className="h-[60px]"></div>
         {pages.length > 0 && (
           <select
             value={selectedPage?.id || ""}
