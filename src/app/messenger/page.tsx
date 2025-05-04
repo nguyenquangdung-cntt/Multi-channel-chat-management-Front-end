@@ -7,6 +7,10 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
+import slide1 from "../../../public/images/slide-1.png";
+import slide2 from "../../../public/images/slide-2.png";
+import slide3 from "../../../public/images/slide-3.png";
+
 
 type User = { id: string; name: string };
 type Message = { from: "user" | "bot"; text: string; pending?: boolean; error?: boolean };
@@ -593,17 +597,17 @@ export default function Page() {
             spaceBetween={20}
             slidesPerView={1}
             navigation
-            autoplay={{ delay: 3000, disableOnInteraction: false }}
+            autoplay={{ delay: 5000, disableOnInteraction: false }}
             className="w-[80%] max-w-md"
           >
             <SwiperSlide>
-              <img src="/images/img1.jpg" alt="Hình 1" className="rounded-lg shadow-md w-full object-cover" />
+              <img src={slide1} alt="Hình 1" className="rounded-lg shadow-md w-full object-cover" />
             </SwiperSlide>
             <SwiperSlide>
-              <img src="/images/img2.jpg" alt="Hình 2" className="rounded-lg shadow-md w-full object-cover" />
+              <img src={slide2} alt="Hình 2" className="rounded-lg shadow-md w-full object-cover" />
             </SwiperSlide>
             <SwiperSlide>
-              <img src="/images/img3.jpg" alt="Hình 3" className="rounded-lg shadow-md w-full object-cover" />
+              <img src={slide3} alt="Hình 3" className="rounded-lg shadow-md w-full object-cover" />
             </SwiperSlide>
           </Swiper>
 
