@@ -285,10 +285,7 @@ export default function Page() {
               </button>
             </div>
           </main>
-          {/* Nội dung modal */}
-          <div className="bg-gray-100 p-6 rounded-lg shadow-lg">
-            <button onClick={() => setIsModalOpen(false)} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded">Đóng</button>
-          </div>
+          <button onClick={() => setIsModalOpen(false)} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded">Đóng</button>
         </div>
       )}
       {/* Sidebar */}
