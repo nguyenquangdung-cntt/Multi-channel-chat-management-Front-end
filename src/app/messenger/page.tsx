@@ -192,7 +192,7 @@ export default function Page() {
         <div className="overflow-y-auto mt-4">
           {loadingUsers ? (
             [...Array(5)].map((_, i) => (
-              <div key={i} className="h-10 bg-gray-300 animate-pulse"></div>
+              <div key={i} className="h-screen bg-gray-300 animate-pulse"></div>
             ))
           ) : (
             users.map((user) => (
