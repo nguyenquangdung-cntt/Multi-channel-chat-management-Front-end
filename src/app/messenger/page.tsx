@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import { io, Socket } from "socket.io-client";
@@ -44,16 +44,12 @@ export default function Page() {
     socketRef.current.emit("join_page", selectedPage.id);
 
     // Lắng nghe sự kiện new_message
-    const handleNewMessage = (data: any) => {
-      console.log("New message received:", data); // Debug log
+    const handleNewMessage = useCallback((data: any) => {
       if (data.pageID !== selectedPage.id) return;
 
+      // Cập nhật giao diện ngay lập tức
       setMessages((prev) => {
         const arr = prev[data.recipientID] || [];
-        // Tránh duplicate tin nhắn
-        if (arr[0] && arr[0].text === data.message && arr[0].from === data.from) {
-          return prev;
-        }
         return {
           ...prev,
           [data.recipientID]: [
@@ -67,47 +63,13 @@ export default function Page() {
       if (selectedUser?.id === data.recipientID) {
         scrollToBottom();
       }
-    };
-
-    // Lắng nghe sự kiện update_conversations
-    const handleUpdateConversations = async (data: any) => {
-      if (data.pageID !== selectedPage.id) return;
-
-      // Tự động làm mới danh sách người dùng và tin nhắn
-      const res = await fetch(`${API_URL}/api/facebook-auth/${userID}/${selectedPage.id}/senders`);
-      const updatedData = await res.json();
-
-      const fanpageId = selectedPage.id;
-      const newUsers: User[] = [];
-      const newMessages: Messages = {};
-
-      for (const convo of updatedData) {
-        const msgs = convo.messages || [];
-        const userMsg = msgs.find((msg: any) => msg.from?.id !== fanpageId);
-        if (userMsg && userMsg.from?.id) {
-          const userId = userMsg.from.id;
-          const userName = userMsg.from.name || `User ${userId}`;
-          if (!newUsers.find((u) => u.id === userId)) {
-            newUsers.push({ id: userId, name: userName });
-            newMessages[userId] = msgs.map((m: any) => ({
-              from: m.from?.id === fanpageId ? "bot" : "user",
-              text: m.message || "",
-            }));
-          }
-        }
-      }
-
-      setUsers(newUsers);
-      setMessages(newMessages);
-    };
+    }, [selectedPage, selectedUser]);
 
     socketRef.current.on("new_message", handleNewMessage);
-    socketRef.current.on("update_conversations", handleUpdateConversations);
 
     return () => {
       if (socketRef.current) {
         socketRef.current.off("new_message", handleNewMessage);
-        socketRef.current.off("update_conversations", handleUpdateConversations);
       }
     };
   }, [selectedPage, selectedUser]);
