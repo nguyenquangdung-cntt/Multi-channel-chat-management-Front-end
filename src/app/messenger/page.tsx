@@ -33,23 +33,25 @@ export default function Page() {
 
   const socketRef = useRef<Socket | null>(null);
 
+  
   useEffect(() => {
     if (!selectedPage) return;
-
-    // Nếu chưa connect socket thì connect
+  
     if (!socketRef.current) {
       socketRef.current = io(API_URL);
     }
-    // Join room theo pageID để chỉ nhận tin của fanpage tương ứng
+  
+    // Join room theo pageID
     socketRef.current.emit("join_page", selectedPage.id);
-
+  
     // Lắng nghe sự kiện new_message
     const handleNewMessage = (data: any) => {
+      console.log("New message received:", data); // Debug log
       if (data.pageID !== selectedPage.id) return;
-
+  
       setMessages((prev) => {
         const arr = prev[data.recipientID] || [];
-        // Tránh duplicate nếu đã có tin nhắn này rồi
+        // Tránh duplicate tin nhắn
         if (arr[0] && arr[0].text === data.message && arr[0].from === data.from) {
           return prev;
         }
@@ -61,16 +63,23 @@ export default function Page() {
           ],
         };
       });
+  
+      // Tự động cuộn xuống cuối nếu đang xem đúng user
+      if (selectedUser?.id === data.recipientID) {
+        scrollToBottom();
+      }
     };
-
+  
     socketRef.current.on("new_message", handleNewMessage);
-
+  
     return () => {
       if (socketRef.current) {
         socketRef.current.off("new_message", handleNewMessage);
       }
     };
-  }, [selectedPage]);
+  }, [selectedPage, selectedUser]);
+
+  
 
   useEffect(() => {
     const storedPages = localStorage.getItem("fb_pages");
@@ -86,7 +95,50 @@ export default function Page() {
       const user = JSON.parse(storedUser);
       setUserID(user.id);
     }
-  }, []);
+  }, []);  useEffect(() => {
+    if (!selectedPage) return;
+  
+    if (!socketRef.current) {
+      socketRef.current = io(API_URL);
+    }
+  
+    // Join room theo pageID
+    socketRef.current.emit("join_page", selectedPage.id);
+  
+    // Lắng nghe sự kiện new_message
+    const handleNewMessage = (data: any) => {
+      console.log("New message received:", data); // Debug log
+      if (data.pageID !== selectedPage.id) return;
+  
+      setMessages((prev) => {
+        const arr = prev[data.recipientID] || [];
+        // Tránh duplicate tin nhắn
+        if (arr[0] && arr[0].text === data.message && arr[0].from === data.from) {
+          return prev;
+        }
+        return {
+          ...prev,
+          [data.recipientID]: [
+            { from: data.from, text: data.message },
+            ...arr,
+          ],
+        };
+      });
+  
+      // Tự động cuộn xuống cuối nếu đang xem đúng user
+      if (selectedUser?.id === data.recipientID) {
+        scrollToBottom();
+      }
+    };
+  
+    socketRef.current.on("new_message", handleNewMessage);
+  
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.off("new_message", handleNewMessage);
+      }
+    };
+  }, [selectedPage, selectedUser]);
 
   useEffect(() => {
     const fetchSenders = async () => {
