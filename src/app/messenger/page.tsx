@@ -598,16 +598,16 @@ export default function Page() {
             slidesPerView={1}
             navigation
             autoplay={{ delay: 5000, disableOnInteraction: false }}
-            className="w-[500px] max-w-md"
+            className="xxl:w-[800px] xl:w-[500px] lg:w-[300px] md:w-[400px]"
           >
             <SwiperSlide>
-              <img src={slide1.src} alt="Hình 1" className="rounded-lg shadow-md w-full object-cover" />
+              <img src={slide1.src} alt="Hình 1" className="w-full object-cover" />
             </SwiperSlide>
             <SwiperSlide>
-              <img src={slide2.src} alt="Hình 2" className="rounded-lg shadow-md w-full object-cover" />
+              <img src={slide2.src} alt="Hình 2" className="w-full object-cover" />
             </SwiperSlide>
             <SwiperSlide>
-              <img src={slide3.src} alt="Hình 3" className="rounded-lg shadow-md w-full object-cover" />
+              <img src={slide3.src} alt="Hình 3" className="w-full object-cover" />
             </SwiperSlide>
           </Swiper>
 
