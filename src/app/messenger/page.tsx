@@ -10,6 +10,8 @@ type Page = { id: string; name: string };
 
 const initialMessages: Messages = {};
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
 export default function Page() {
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -27,6 +29,47 @@ export default function Page() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [errorUserId, setErrorUserId] = useState<string | null>(null);
+
+  const socketRef = useRef<Socket | null>(null);
+
+  useEffect(() => {
+    if (!selectedPage) return;
+
+    // Nếu chưa connect socket thì connect
+    if (!socketRef.current) {
+      socketRef.current = io(API_URL);
+    }
+    // Join room theo pageID để chỉ nhận tin của fanpage tương ứng
+    socketRef.current.emit("join_page", selectedPage.id);
+
+    // Lắng nghe sự kiện new_message
+    const handleNewMessage = (data: any) => {
+      if (data.pageID !== selectedPage.id) return;
+
+      setMessages((prev) => {
+        const arr = prev[data.recipientID] || [];
+        // Tránh duplicate nếu đã có tin nhắn này rồi
+        if (arr[0] && arr[0].text === data.message && arr[0].from === data.from) {
+          return prev;
+        }
+        return {
+          ...prev,
+          [data.recipientID]: [
+            { from: data.from, text: data.message },
+            ...arr,
+          ],
+        };
+      });
+    };
+
+    socketRef.current.on("new_message", handleNewMessage);
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.off("new_message", handleNewMessage);
+      }
+    };
+  }, [selectedPage]);
 
   useEffect(() => {
     const storedPages = localStorage.getItem("fb_pages");
