@@ -209,11 +209,11 @@ export default function Page() {
       </div>
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-white flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-white flex items-center justify-center z-50" style={{ paddingTop: 'env(safe-area-inset-top, 24px)' }}>
           <div className="relative w-full max-w-3xl bg-white rounded-lg shadow-lg flex flex-col h-screen">
             
             {/* Header Modal - Luôn cố định trên cùng */}
-            <div className="p-4 font-semibold text-lg bg-blue-700 text-white flex justify-between items-center flex-none" style={{ paddingTop: 'env(safe-area-inset-top, 24px)' }}>
+            <div className="p-4 font-semibold text-lg bg-blue-700 text-white flex justify-between items-center flex-none">
               <span>{selectedUser?.name || "Messenger"}</span>
               <button onClick={() => setIsModalOpen(false)} className="text-white text-2xl hover:text-red-400 transition">
                 ✕
