@@ -5,7 +5,7 @@ import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import { io, Socket } from "socket.io-client";
 
 type User = { id: string; name: string };
-type Message = { from: "user" | "bot"; text: string };
+type Message = { from: "user" | "bot"; text: string; pending?: boolean; error?: boolean };
 type Messages = { [userId: string]: Message[] };
 type Page = { id: string; name: string };
 
@@ -195,10 +195,13 @@ export default function Page() {
 
     const userMessage: Message = { from: "bot", text: input };
 
-    // Add the message to the UI immediately
+    // Add the message to the UI immediately and mark it as "pending"
     setMessages((prev) => ({
       ...prev,
-      [selectedUser.id]: [userMessage, ...(prev[selectedUser.id] || [])],
+      [selectedUser.id]: [
+        { ...userMessage, pending: true }, // Add a pending flag
+        ...(prev[selectedUser.id] || []),
+      ],
     }));
 
     setInput("");
@@ -227,12 +230,42 @@ export default function Page() {
           alert("❗ Gửi tin nhắn thất bại: " + (data.error || "Lỗi không xác định"));
         }
         setMessageStatus("error");
+
+        // Update the message to indicate an error
+        setMessages((prev) => ({
+          ...prev,
+          [selectedUser.id]: prev[selectedUser.id].map((msg) =>
+            msg.text === userMessage.text && msg.pending
+              ? { ...msg, pending: false, error: true }
+              : msg
+          ),
+        }));
       } else {
         setMessageStatus("sent");
+
+        // Update the message to remove the "pending" flag
+        setMessages((prev) => ({
+          ...prev,
+          [selectedUser.id]: prev[selectedUser.id].map((msg) =>
+            msg.text === userMessage.text && msg.pending
+              ? { ...msg, pending: false }
+              : msg
+          ),
+        }));
       }
     } catch (err: any) {
       console.error("Gửi tin nhắn thất bại:", err.message);
       setMessageStatus("error");
+
+      // Update the message to indicate an error
+      setMessages((prev) => ({
+        ...prev,
+        [selectedUser.id]: prev[selectedUser.id].map((msg) =>
+          msg.text === userMessage.text && msg.pending
+            ? { ...msg, pending: false, error: true }
+            : msg
+        ),
+      }));
     } finally {
       setTimeout(() => {
         setShowStatusIndex(null);
