@@ -14,6 +14,18 @@ const initialMessages: Messages = {};
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 export default function Page() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // Function to check login status
+  const checkLogin = () => {
+    const storedUser = localStorage.getItem("fb_user");
+    setIsLoggedIn(!!storedUser);
+  };
+
+  useEffect(() => {
+    checkLogin();
+  }, []);
+
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [messages, setMessages] = useState<Messages>(initialMessages);
@@ -303,60 +315,190 @@ export default function Page() {
 
   return (
     <div id="content-chat" className="flex sm:h-[1180px] h-screen w-full">
-      {/* 📌 Mobile: Dropdown + User List */}
-      <div className="w-full h-screen bg-gray-100 sm:hidden">
-        <div className="h-[70px]"></div>
-        <div className="px-4">
-          {pages.length > 0 && (
-            <select
-              value={selectedPage?.id || ""}
-              onChange={(e) => {
-                const page = pages.find((p) => p.id === e.target.value);
-                setSelectedPage(page || null);
-              }}
-              className="w-full h-10 bg-white border border-gray-300 text-sm px-2"
-            >
-              {pages.map((page) => (
-                <option key={page.id} value={page.id}>{page.name}</option>
-              ))}
-            </select>
-          )}
-        </div>
-
-        {/* Danh sách User */}
-        <div className="overflow-y-auto mt-4">
-          {loadingUsers ? (
-            [...Array(5)].map((_, i) => (
-              <div key={i} className="h-screen bg-gray-300 animate-pulse"></div>
-            ))
-          ) : (
-            users.map((user) => (
-              <div
-                key={user.id}
-                onClick={() => handleSelectUserMobile(user)}
-                className="p-4 cursor-pointer hover:bg-blue-200 border border-gray-300"
-              >
-                {user.name}
-              </div>
-            ))
-          )}
-        </div>
-      </div>
-      {/* Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-white flex items-center justify-center z-50 mt-[]">
-          <div className="relative w-full max-w-3xl bg-white rounded-lg shadow-lg flex flex-col h-screen pt-[30px]">
-            
-            {/* Header Modal - Luôn cố định trên cùng */}
-            <div className="p-4 font-semibold text-lg bg-blue-700 text-white flex justify-between items-center flex-none">
-              <span>{selectedUser?.name || "Messenger"}</span>
-              <button onClick={() => setIsModalOpen(false)} className="text-white text-2xl hover:text-red-400 transition">
-                ✕
-              </button>
+      {isLoggedIn ? (
+        <>
+          {/* 📌 Mobile: Dropdown + User List */}
+          <div className="w-full h-screen bg-gray-100 sm:hidden">
+            <div className="h-[70px]"></div>
+            <div className="px-4">
+              {pages.length > 0 && (
+                <select
+                  value={selectedPage?.id || ""}
+                  onChange={(e) => {
+                    const page = pages.find((p) => p.id === e.target.value);
+                    setSelectedPage(page || null);
+                  }}
+                  className="w-full h-10 bg-white border border-gray-300 text-sm px-2"
+                >
+                  {pages.map((page) => (
+                    <option key={page.id} value={page.id}>{page.name}</option>
+                  ))}
+                </select>
+              )}
             </div>
 
-            {/* Nội dung Chat - Chỉ phần này được scroll */}
-            <div className="flex-1 h-0 p-4 overflow-y-auto flex flex-col-reverse space-y-reverse space-y-2 bg-gray-50 pb-[50px]">
+            {/* Danh sách User */}
+            <div className="overflow-y-auto mt-4">
+              {loadingUsers ? (
+                [...Array(5)].map((_, i) => (
+                  <div key={i} className="h-screen bg-gray-300 animate-pulse"></div>
+                ))
+              ) : (
+                users.map((user) => (
+                  <div
+                    key={user.id}
+                    onClick={() => handleSelectUserMobile(user)}
+                    className="p-4 cursor-pointer hover:bg-blue-200 border border-gray-300"
+                  >
+                    {user.name}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+          {/* Modal */}
+          {isModalOpen && (
+            <div className="fixed inset-0 bg-white flex items-center justify-center z-50 mt-[]">
+              <div className="relative w-full max-w-3xl bg-white rounded-lg shadow-lg flex flex-col h-screen pt-[30px]">
+                
+                {/* Header Modal - Luôn cố định trên cùng */}
+                <div className="p-4 font-semibold text-lg bg-blue-700 text-white flex justify-between items-center flex-none">
+                  <span>{selectedUser?.name || "Messenger"}</span>
+                  <button onClick={() => setIsModalOpen(false)} className="text-white text-2xl hover:text-red-400 transition">
+                    ✕
+                  </button>
+                </div>
+
+                {/* Nội dung Chat - Chỉ phần này được scroll */}
+                <div className="flex-1 h-0 p-4 overflow-y-auto flex flex-col-reverse space-y-reverse space-y-2 bg-gray-50 pb-[50px]">
+                  {selectedUser?.id === errorUserId && errorMessage && (
+                    <div className="text-red-600 text-sm mt-2 self-end">
+                      ⚠️ {errorMessage}
+                    </div>
+                  )}
+                  <div ref={messagesEndRef} />
+                  {isTyping && (
+                    <div className="ml-auto bg-gray-300 text-gray-700 px-4 py-2 rounded-2xl max-w-[80%]">
+                      <div className="flex items-center space-x-1">
+                        <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.2s]"></div>
+                        <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.1s]"></div>
+                        <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
+                      </div>
+                    </div>
+                  )}
+                  {loadingMessages ? (
+                    [...Array(6)].map((_, i) => (
+                      <div
+                        key={i}
+                        className={`px-4 py-2 rounded-2xl max-w-[80%] animate-pulse ${
+                          i % 2 === 0 ? "ml-auto bg-blue-200" : "mr-auto bg-gray-300"
+                        } h-[20px]`}
+                      />
+                    ))
+                  ) : selectedUser && messages[selectedUser.id] ? (
+                    messages[selectedUser.id].map((msg: Message, idx: number) => (
+                      <div
+                        key={idx}
+                        className={`flex flex-col max-w-[80%] ${
+                          msg.from === "bot" ? "ml-auto items-end" : "mr-auto items-start"
+                        }`}
+                      >
+                        <div
+                          className={`px-4 py-2 rounded-2xl break-words ${
+                            msg.from === "user"
+                              ? "mr-auto bg-gray-200 text-gray-800"
+                              : "ml-auto bg-blue-500 text-white"
+                          }`}
+                        >
+                          {msg.text}
+                        </div>
+                    
+                        {msg.from === "bot" && showStatusIndex === idx && (
+                          <span className="text-xs text-gray-500 mt-1">
+                            {messageStatus === "sending" && "Đang gửi..."}
+                            {messageStatus === "sent" && "Đã gửi"}
+                            {messageStatus === "error" && "Tin nhắn không gửi được"}
+                          </span>
+                        )}
+                      </div>
+                    ))
+                  ) : null}
+                </div>
+
+                {/* Ô nhập tin nhắn - Luôn cố định dưới */}
+                <div className="p-4 flex items-center gap-2 bg-white border-t border-gray-300 flex-none sticky bottom-0 w-full max-w-3xl">
+                  <input
+                    type="text"
+                    placeholder="Type a message..."
+                    value={input}
+                    onChange={(e) => {
+                      setInput(e.target.value);
+                      handleTyping();
+                    }}
+                    onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-[10px] outline-none bg-gray-100 h-[50px]"
+                  />
+                  <button
+                    onClick={handleSend}
+                    className="bg-blue-700 text-white p-3 rounded-full hover:bg-blue-900 transition cursor-pointer"
+                  >
+                    <FontAwesomeIcon icon={faPaperPlane} />
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          )}
+
+          {/* Sidebar */}
+          <aside className="hidden sm:block w-64 bg-gray-100 p-4 space-y-2 overflow-y-auto">
+            {pages.length > 0 && (
+              <div className="sticky top-0 bg-gray-100 pb-2 z-10">
+                <select
+                  value={selectedPage?.id || ""}
+                  onChange={(e) => {
+                    const page = pages.find((p) => p.id === e.target.value);
+                    setSelectedPage(page || null);
+                  }}
+                  className="bg-white border border-gray-300 rounded text-sm h-10 px-2 w-full"
+                >
+                  {pages.map((page) => (
+                    <option className="p-4" key={page.id} value={page.id}>
+                      {page.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {loadingUsers ? (
+              [...Array(5)].map((_, i) => (
+                <div key={i} className="h-10 bg-gray-300 rounded-md animate-pulse mb-2"></div>
+              ))
+            ) : (
+              users.map((user) => (
+                <div
+                  key={user.id}
+                  onClick={() => handleSelectUser(user)}
+                  className={`p-2 px-4 rounded-r-[50px] cursor-pointer ${
+                    selectedUser?.id === user.id
+                      ? "bg-blue-700 text-white"
+                      : "hover:bg-blue-200"
+                  }`}
+                >
+                  {user.name}
+                </div>
+              ))
+            )}
+          </aside>
+
+          {/* Main Chat */}
+          <main className="hidden sm:flex flex-1 flex-col bg-white">
+            <div className="p-4 font-semibold text-lg bg-blue-700 text-white">
+              {selectedUser?.name || "Messenger"}
+            </div>
+
+            <div className="flex-1 h-0 p-4 overflow-y-auto flex flex-col-reverse space-y-reverse space-y-2 bg-gray-50">
               {selectedUser?.id === errorUserId && errorMessage && (
                 <div className="text-red-600 text-sm mt-2 self-end">
                   ⚠️ {errorMessage}
@@ -382,37 +524,36 @@ export default function Page() {
                   />
                 ))
               ) : selectedUser && messages[selectedUser.id] ? (
-                messages[selectedUser.id].map((msg: Message, idx: number) => (
-                  <div
-                    key={idx}
-                    className={`flex flex-col max-w-[80%] ${
-                      msg.from === "bot" ? "ml-auto items-end" : "mr-auto items-start"
-                    }`}
-                  >
+                  messages[selectedUser.id].map((msg: Message, idx: number) => (
                     <div
-                      className={`px-4 py-2 rounded-2xl break-words ${
-                        msg.from === "user"
-                          ? "mr-auto bg-gray-200 text-gray-800"
-                          : "ml-auto bg-blue-500 text-white"
+                      key={idx}
+                      className={`flex flex-col max-w-[80%] ${
+                        msg.from === "bot" ? "ml-auto items-end" : "mr-auto items-start"
                       }`}
                     >
-                      {msg.text}
+                      <div
+                        className={`px-4 py-2 rounded-2xl break-words ${
+                          msg.from === "user"
+                            ? "mr-auto bg-gray-200 text-gray-800"
+                            : "ml-auto bg-blue-500 text-white"
+                        }`}
+                      >
+                        {msg.text}
+                      </div>
+                    
+                      {msg.from === "bot" && showStatusIndex === idx && (
+                        <span className="text-xs text-gray-500 mt-1">
+                          {messageStatus === "sending" && "Đang gửi..."}
+                          {messageStatus === "sent" && "Đã gửi"}
+                          {messageStatus === "error" && "Tin nhắn không gửi được"}
+                        </span>
+                      )}
                     </div>
-                
-                    {msg.from === "bot" && showStatusIndex === idx && (
-                      <span className="text-xs text-gray-500 mt-1">
-                        {messageStatus === "sending" && "Đang gửi..."}
-                        {messageStatus === "sent" && "Đã gửi"}
-                        {messageStatus === "error" && "Tin nhắn không gửi được"}
-                      </span>
-                    )}
-                  </div>
-                ))
-              ) : null}
+                  ))
+                ) : null}
             </div>
 
-            {/* Ô nhập tin nhắn - Luôn cố định dưới */}
-            <div className="p-4 flex items-center gap-2 bg-white border-t border-gray-300 flex-none sticky bottom-0 w-full max-w-3xl">
+            <div className="p-4 flex items-center gap-2 bg-white">
               <input
                 type="text"
                 placeholder="Type a message..."
@@ -431,134 +572,13 @@ export default function Page() {
                 <FontAwesomeIcon icon={faPaperPlane} />
               </button>
             </div>
-
-          </div>
+          </main>
+        </>
+      ) : (
+        <div className="flex-1 flex items-center justify-center bg-gray-100">
+          <p className="text-gray-500 text-lg">Please log in to access the chat.</p>
         </div>
       )}
-
-      {/* Sidebar */}
-      <aside className="hidden sm:block w-64 bg-gray-100 p-4 space-y-2 overflow-y-auto">
-        {pages.length > 0 && (
-          <div className="sticky top-0 bg-gray-100 pb-2 z-10">
-            <select
-              value={selectedPage?.id || ""}
-              onChange={(e) => {
-                const page = pages.find((p) => p.id === e.target.value);
-                setSelectedPage(page || null);
-              }}
-              className="bg-white border border-gray-300 rounded text-sm h-10 px-2 w-full"
-            >
-              {pages.map((page) => (
-                <option className="p-4" key={page.id} value={page.id}>
-                  {page.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-
-        {loadingUsers ? (
-          [...Array(5)].map((_, i) => (
-            <div key={i} className="h-10 bg-gray-300 rounded-md animate-pulse mb-2"></div>
-          ))
-        ) : (
-          users.map((user) => (
-            <div
-              key={user.id}
-              onClick={() => handleSelectUser(user)}
-              className={`p-2 px-4 rounded-r-[50px] cursor-pointer ${
-                selectedUser?.id === user.id
-                  ? "bg-blue-700 text-white"
-                  : "hover:bg-blue-200"
-              }`}
-            >
-              {user.name}
-            </div>
-          ))
-        )}
-      </aside>
-
-      {/* Main Chat */}
-      <main className="hidden sm:flex flex-1 flex-col bg-white">
-        <div className="p-4 font-semibold text-lg bg-blue-700 text-white">
-          {selectedUser?.name || "Messenger"}
-        </div>
-
-        <div className="flex-1 h-0 p-4 overflow-y-auto flex flex-col-reverse space-y-reverse space-y-2 bg-gray-50">
-          {selectedUser?.id === errorUserId && errorMessage && (
-            <div className="text-red-600 text-sm mt-2 self-end">
-              ⚠️ {errorMessage}
-            </div>
-          )}
-          <div ref={messagesEndRef} />
-          {isTyping && (
-            <div className="ml-auto bg-gray-300 text-gray-700 px-4 py-2 rounded-2xl max-w-[80%]">
-              <div className="flex items-center space-x-1">
-                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.2s]"></div>
-                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.1s]"></div>
-                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
-              </div>
-            </div>
-          )}
-          {loadingMessages ? (
-            [...Array(6)].map((_, i) => (
-              <div
-                key={i}
-                className={`px-4 py-2 rounded-2xl max-w-[80%] animate-pulse ${
-                  i % 2 === 0 ? "ml-auto bg-blue-200" : "mr-auto bg-gray-300"
-                } h-[20px]`}
-              />
-            ))
-          ) : selectedUser && messages[selectedUser.id] ? (
-              messages[selectedUser.id].map((msg: Message, idx: number) => (
-                <div
-                  key={idx}
-                  className={`flex flex-col max-w-[80%] ${
-                    msg.from === "bot" ? "ml-auto items-end" : "mr-auto items-start"
-                  }`}
-                >
-                  <div
-                    className={`px-4 py-2 rounded-2xl break-words ${
-                      msg.from === "user"
-                        ? "mr-auto bg-gray-200 text-gray-800"
-                        : "ml-auto bg-blue-500 text-white"
-                    }`}
-                  >
-                    {msg.text}
-                  </div>
-              
-                  {msg.from === "bot" && showStatusIndex === idx && (
-                    <span className="text-xs text-gray-500 mt-1">
-                      {messageStatus === "sending" && "Đang gửi..."}
-                      {messageStatus === "sent" && "Đã gửi"}
-                      {messageStatus === "error" && "Tin nhắn không gửi được"}
-                    </span>
-                  )}
-                </div>
-              ))
-            ) : null}
-        </div>
-
-        <div className="p-4 flex items-center gap-2 bg-white">
-          <input
-            type="text"
-            placeholder="Type a message..."
-            value={input}
-            onChange={(e) => {
-              setInput(e.target.value);
-              handleTyping();
-            }}
-            onKeyDown={(e) => e.key === "Enter" && handleSend()}
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-[10px] outline-none bg-gray-100 h-[50px]"
-          />
-          <button
-            onClick={handleSend}
-            className="bg-blue-700 text-white p-3 rounded-full hover:bg-blue-900 transition cursor-pointer"
-          >
-            <FontAwesomeIcon icon={faPaperPlane} />
-          </button>
-        </div>
-      </main>
     </div>
   );
 }
