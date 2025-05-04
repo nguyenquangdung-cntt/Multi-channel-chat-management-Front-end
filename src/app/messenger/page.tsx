@@ -600,7 +600,7 @@ export default function Page() {
             autoplay={{ delay: 5000, disableOnInteraction: false }}
             className="w-[500px] max-w-md"
           >
-            <SwiperSlide>làm 
+            <SwiperSlide>
               <img src={slide1.src} alt="Hình 1" className="rounded-lg shadow-md w-full object-cover" />
             </SwiperSlide>
             <SwiperSlide>
