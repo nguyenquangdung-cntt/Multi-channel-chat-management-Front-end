@@ -170,7 +170,7 @@ export default function Page() {
     <div id="content-chat" className="flex sm:h-[1180px] h-screen w-full">
       {/* 📌 Mobile: Dropdown + User List */}
       <div className="w-full h-screen bg-gray-100 sm:hidden">
-        <div className="h-[60px]"></div>
+        <div className="h-[70px]"></div>
         {pages.length > 0 && (
           <select
             value={selectedPage?.id || ""}
@@ -178,7 +178,7 @@ export default function Page() {
               const page = pages.find((p) => p.id === e.target.value);
               setSelectedPage(page || null);
             }}
-            className="w-full h-10 bg-white border border-gray-300 rounded text-sm px-2 ml-4 mr-4"
+            className="w-full h-10 bg-white border border-gray-300 text-sm px-2"
           >
             {pages.map((page) => (
               <option key={page.id} value={page.id}>{page.name}</option>
@@ -190,14 +190,14 @@ export default function Page() {
         <div className="overflow-y-auto mt-4">
           {loadingUsers ? (
             [...Array(5)].map((_, i) => (
-              <div key={i} className="h-10 bg-gray-300 rounded-md animate-pulse mb-2"></div>
+              <div key={i} className="h-10 bg-gray-300 animate-pulse"></div>
             ))
           ) : (
             users.map((user) => (
               <div
                 key={user.id}
                 onClick={() => handleSelectUserMobile(user)}
-                className="p-4 rounded cursor-pointer hover:bg-blue-200 border border-gray-300"
+                className="p-4 cursor-pointer hover:bg-blue-200 border border-gray-300"
               >
                 {user.name}
               </div>
