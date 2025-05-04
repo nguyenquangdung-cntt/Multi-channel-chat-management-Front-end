@@ -601,13 +601,13 @@ export default function Page() {
             className="w-[80%] max-w-md"
           >
             <SwiperSlide>
-              <img src={slide1} alt="Hình 1" className="rounded-lg shadow-md w-full object-cover" />
+              <img src={slide1.src} alt="Hình 1" className="rounded-lg shadow-md w-full object-cover" />
             </SwiperSlide>
             <SwiperSlide>
-              <img src={slide2} alt="Hình 2" className="rounded-lg shadow-md w-full object-cover" />
+              <img src={slide2.src} alt="Hình 2" className="rounded-lg shadow-md w-full object-cover" />
             </SwiperSlide>
             <SwiperSlide>
-              <img src={slide3} alt="Hình 3" className="rounded-lg shadow-md w-full object-cover" />
+              <img src={slide3.src} alt="Hình 3" className="rounded-lg shadow-md w-full object-cover" />
             </SwiperSlide>
           </Swiper>
 
