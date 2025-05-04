@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
+import { io, Socket } from "socket.io-client";
 
 type User = { id: string; name: string };
 type Message = { from: "user" | "bot"; text: string };
