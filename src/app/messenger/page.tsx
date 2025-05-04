@@ -210,7 +210,7 @@ export default function Page() {
       {isModalOpen && (
         <div className="fixed inset-0 bg-white flex items-center justify-center z-50">
           {/* Main Chat */}
-          <main className="hidden sm:flex flex-1 flex-col bg-white">
+          <main className="flex flex-1 flex-col bg-white">
             <div className="p-4 font-semibold text-lg bg-blue-700 text-white">
               {selectedUser?.name || "Messenger"}
             </div>
