@@ -123,7 +123,7 @@ export default function Page() {
   
     try {
       const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-      await fetch(`${API_URL}/api/facebook-auth/${userID}/${selectedPage.id}/send-message`, {
+      const res = await fetch(`${API_URL}/api/facebook-auth/${userID}/${selectedPage.id}/send-message`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -132,14 +132,24 @@ export default function Page() {
         }),
       });
   
-      setMessageStatus("sent");
-      setTimeout(() => {
-        setShowStatusIndex(null);
-        setMessageStatus("idle");
-      }, 5000);
+      const data = await res.json();
+  
+      if (!res.ok) {
+        if (data.isOutside24hWindow) {
+          alert("❗ Tin nhắn này được gửi ngoài khoảng thời gian cho phép (24 giờ) và không thể gửi.");
+        } else {
+          alert("❗ Gửi tin nhắn thất bại: " + (data.error || "Lỗi không xác định"));
+        }
+        setMessageStatus("error");
+      } else {
+        setMessageStatus("sent");
+      }
+  
     } catch (err: any) {
       console.error("Gửi tin nhắn thất bại:", err.message);
+      alert("❗ Lỗi hệ thống: Không thể gửi tin nhắn.");
       setMessageStatus("error");
+    } finally {
       setTimeout(() => {
         setShowStatusIndex(null);
         setMessageStatus("idle");
@@ -147,7 +157,6 @@ export default function Page() {
     }
   };
   
-
   const handleTyping = () => {
     if (!isTyping) setIsTyping(true);
     clearTimeout((handleTyping as any).typingTimeout);
