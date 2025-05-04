@@ -75,3 +75,9 @@ header {
   font-size: 20px !important;
   color: black;
 }
+
+@media (width = 1440px) {
+  #home{
+    height: 600px;
+  }
+}
