@@ -210,10 +210,10 @@ export default function Page() {
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-white flex items-center justify-center z-50 mt-[]">
-          <div className="relative w-full max-w-3xl bg-white rounded-lg shadow-lg flex flex-col h-screen">
+          <div className="relative w-full max-w-3xl bg-white rounded-lg shadow-lg flex flex-col h-screen pt-[25px]">
             
             {/* Header Modal - Luôn cố định trên cùng */}
-            <div className="sticky p-4 font-semibold text-lg bg-blue-700 text-white flex justify-between items-center flex-none">
+            <div className="p-4 font-semibold text-lg bg-blue-700 text-white flex justify-between items-center flex-none">
               <span>{selectedUser?.name || "Messenger"}</span>
               <button onClick={() => setIsModalOpen(false)} className="text-white text-2xl hover:text-red-400 transition">
                 ✕
@@ -221,7 +221,7 @@ export default function Page() {
             </div>
 
             {/* Nội dung Chat - Chỉ phần này được scroll */}
-            <div className="flex-1 h-0 p-4 overflow-y-auto flex flex-col-reverse space-y-reverse space-y-2 bg-gray-50 pb-[70px]">
+            <div className="flex-1 h-0 p-4 overflow-y-auto flex flex-col-reverse space-y-reverse space-y-2 bg-gray-50 pb-[50px]">
               <div ref={messagesEndRef} />
               {isTyping && (
                 <div className="ml-auto bg-gray-300 text-gray-700 px-4 py-2 rounded-2xl max-w-[80%]">
