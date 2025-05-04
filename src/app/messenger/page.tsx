@@ -24,6 +24,7 @@ export default function Page() {
   const [messageStatus, setMessageStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [showStatusIndex, setShowStatusIndex] = useState<number | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const storedPages = localStorage.getItem("fb_pages");
@@ -92,6 +93,15 @@ export default function Page() {
     setTimeout(() => {
       setLoadingMessages(false);
     }, 500);
+  };
+
+  const handleSelectUserMobile = (user: User) => {
+    setSelectedUser(user);
+    setLoadingMessages(true);
+    setTimeout(() => {
+      setLoadingMessages(false);
+    }, 500);
+    setIsModalOpen(true);
   };
 
   const handleSend = async () => {
@@ -185,7 +195,7 @@ export default function Page() {
             users.map((user) => (
               <div
                 key={user.id}
-                onClick={() => handleSelectUser(user)}
+                onClick={() => handleSelectUserMobile(user)}
                 className={`p-2 rounded cursor-pointer ${
                   selectedUser?.id === user.id ? "bg-blue-700 text-white" : "hover:bg-blue-200"
                 }`}
@@ -196,37 +206,16 @@ export default function Page() {
           )}
         </div>
       </div>
-      {selectedUser && (
-        <main className="flex-1 flex flex-col bg-white sm:hidden">
-          <div className="p-4 font-semibold text-lg bg-blue-700 text-white">
-            {selectedUser.name}
+      {/* Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-white flex items-center justify-center z-50">
+          {/* Nội dung modal */}
+          <div className="bg-gray-100 p-6 rounded-lg shadow-lg">
+            <h2 className="text-xl font-semibold">Modal Title</h2>
+            <p className="mt-2">Nội dung modal ở đây...</p>
+            <button onClick={() => setIsModalOpen(false)} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded">Đóng</button>
           </div>
-
-          <div className="flex-1 h-0 p-4 overflow-y-auto bg-gray-50">
-            <div ref={messagesEndRef} />
-            {messages[selectedUser.id]?.map((msg: Message, idx: number) => (
-              <div key={idx} className={`px-4 py-2 rounded max-w-[80%] break-words ${msg.from === "user" ? "bg-gray-200" : "bg-blue-500 text-white"} my-1`}>
-                {msg.text}
-              </div>
-            ))}
-          </div>
-
-          <div className="p-4 flex items-center gap-2 bg-white">
-            <input
-              type="text"
-              placeholder="Type a message..."
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded bg-gray-100 h-10"
-            />
-            <button
-              onClick={handleSend}
-              className="bg-blue-700 text-white p-3 rounded-full hover:bg-blue-900 transition"
-            >
-              <FontAwesomeIcon icon={faPaperPlane} />
-            </button>
-          </div>
-        </main>
+        </div>
       )}
       {/* Sidebar */}
       <aside className="hidden sm:block w-64 bg-gray-100 p-4 space-y-2 overflow-y-auto">
