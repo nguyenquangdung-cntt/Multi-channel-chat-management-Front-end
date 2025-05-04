@@ -137,7 +137,7 @@ export default function Page() {
   
       if (!res.ok) {
         if (data.isOutside24hWindow) {
-          alert("❗ Tin nhắn này được gửi ngoài khoảng thời gian cho phép (24 giờ) và không thể gửi.");
+          setErrorMessage("Tin nhắn này được gửi ngoài khoảng thời gian cho phép (24h) và không thể gửi.Vui lòng yêu cầu người dùng nhắn tin trước.");
         } else {
           alert("❗ Gửi tin nhắn thất bại: " + (data.error || "Lỗi không xác định"));
         }
@@ -148,7 +148,6 @@ export default function Page() {
   
     } catch (err: any) {
       console.error("Gửi tin nhắn thất bại:", err.message);
-      setErrorMessage("Tin nhắn này được gửi ngoài khoảng thời gian cho phép (24h) và không thể gửi.Vui lòng yêu cầu người dùng nhắn tin trước.");
       setMessageStatus("error");
     } finally {
       setTimeout(() => {
