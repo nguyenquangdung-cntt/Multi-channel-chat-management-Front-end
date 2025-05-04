@@ -213,7 +213,7 @@ export default function Page() {
           <div className="relative w-full max-w-3xl bg-white rounded-lg shadow-lg flex flex-col h-screen">
             
             {/* Header Modal - Luôn cố định trên cùng */}
-            <div className="p-4 font-semibold text-lg bg-blue-700 text-white flex justify-between items-center flex-none">
+            <div className="p-4 font-semibold text-lg bg-blue-700 text-white flex justify-between items-center flex-none pt-[20px]">
               <span>{selectedUser?.name || "Messenger"}</span>
               <button onClick={() => setIsModalOpen(false)} className="text-white text-2xl hover:text-red-400 transition">
                 ✕
