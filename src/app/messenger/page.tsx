@@ -209,7 +209,7 @@ export default function Page() {
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-white flex items-center justify-center z-50">
-          <div className="relative w-full max-w-3xl bg-white rounded-lg shadow-lg flex flex-col h-[600px]">
+          <div className="relative w-full max-w-3xl bg-white rounded-lg shadow-lg flex flex-col h-screen">
             
             {/* Header Modal - Luôn cố định trên cùng */}
             <div className="p-4 font-semibold text-lg bg-blue-700 text-white flex justify-between items-center flex-none">
@@ -237,7 +237,7 @@ export default function Page() {
                 ))
               ) : selectedUser && messages[selectedUser.id] ? (
                 messages[selectedUser.id].map((msg: Message, idx: number) => (
-                  <div key={idx} className={`flex flex-col max-w-[80%] ${msg.from === "bot" ? "ml-auto items-end" : "mr-auto items-start"}`}>
+                  <div key={idx} className={`flex space-y-3 max-w-[80%] flex-col-reverse ${msg.from === "bot" ? "ml-auto items-end" : "mr-auto items-start"}`}>
                     <div className={`px-4 py-2 rounded-2xl break-words ${msg.from === "user" ? "mr-auto bg-gray-200 text-gray-800" : "ml-auto bg-blue-500 text-white"}`}>
                       {msg.text}
                     </div>
@@ -254,7 +254,7 @@ export default function Page() {
             </div>
 
             {/* Ô nhập tin nhắn - Luôn cố định dưới */}
-            <div className="p-4 flex items-center gap-2 bg-white border-t flex-none">
+            <div className="p-4 flex items-center gap-2 bg-white border-t border-gray-300 flex-none">
               <input
                 type="text"
                 placeholder="Type a message..."
