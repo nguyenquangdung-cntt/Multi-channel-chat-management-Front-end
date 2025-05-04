@@ -171,20 +171,22 @@ export default function Page() {
       {/* 📌 Mobile: Dropdown + User List */}
       <div className="w-full h-screen bg-gray-100 sm:hidden">
         <div className="h-[70px]"></div>
-        {pages.length > 0 && (
-          <select
-            value={selectedPage?.id || ""}
-            onChange={(e) => {
-              const page = pages.find((p) => p.id === e.target.value);
-              setSelectedPage(page || null);
-            }}
-            className="w-full h-10 bg-white border border-gray-300 text-sm px-2"
-          >
-            {pages.map((page) => (
-              <option key={page.id} value={page.id}>{page.name}</option>
-            ))}
-          </select>
-        )}
+        <div className="px-4">
+          {pages.length > 0 && (
+            <select
+              value={selectedPage?.id || ""}
+              onChange={(e) => {
+                const page = pages.find((p) => p.id === e.target.value);
+                setSelectedPage(page || null);
+              }}
+              className="w-full h-10 bg-white border border-gray-300 text-sm px-2"
+            >
+              {pages.map((page) => (
+                <option key={page.id} value={page.id}>{page.name}</option>
+              ))}
+            </select>
+          )}
+        </div>
 
         {/* Danh sách User */}
         <div className="overflow-y-auto mt-4">
