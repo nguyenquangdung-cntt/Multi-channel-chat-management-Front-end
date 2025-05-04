@@ -71,34 +71,43 @@ export default function Page() {
 
     // Lắng nghe sự kiện update_conversations
     const handleUpdateConversations = async (data: any) => {
-      if (data.pageID !== selectedPage.id) return;
+      if (data.pageID !== selectedPage?.id) return;
 
-      // Tự động làm mới danh sách người dùng và tin nhắn
-      const res = await fetch(`${API_URL}/api/facebook-auth/${userID}/${selectedPage.id}/senders`);
-      const updatedData = await res.json();
+      try {
+        const res = await fetch(`${API_URL}/api/facebook-auth/${userID}/${selectedPage.id}/senders`);
+        const updatedData = await res.json();
 
-      const fanpageId = selectedPage.id;
-      const newUsers: User[] = [];
-      const newMessages: Messages = {};
+        const fanpageId = selectedPage.id;
+        const newMessages: Messages = {};
 
-      for (const convo of updatedData) {
-        const msgs = convo.messages || [];
-        const userMsg = msgs.find((msg: any) => msg.from?.id !== fanpageId);
-        if (userMsg && userMsg.from?.id) {
-          const userId = userMsg.from.id;
-          const userName = userMsg.from.name || `User ${userId}`;
-          if (!newUsers.find((u) => u.id === userId)) {
-            newUsers.push({ id: userId, name: userName });
+        for (const convo of updatedData) {
+          const msgs = convo.messages || [];
+          const userMsg = msgs.find((msg: any) => msg.from?.id !== fanpageId);
+          if (userMsg && userMsg.from?.id) {
+            const userId = userMsg.from.id;
             newMessages[userId] = msgs.map((m: any) => ({
               from: m.from?.id === fanpageId ? "bot" : "user",
               text: m.message || "",
             }));
           }
         }
-      }
 
-      setUsers(newUsers);
-      setMessages(newMessages);
+        // Merge new messages with existing ones
+        setMessages((prev) => {
+          const mergedMessages = { ...prev };
+          for (const userId in newMessages) {
+            mergedMessages[userId] = [
+              ...(prev[userId] || []),
+              ...newMessages[userId].filter(
+                (newMsg) => !(prev[userId] || []).some((oldMsg) => oldMsg.text === newMsg.text)
+              ),
+            ];
+          }
+          return mergedMessages;
+        });
+      } catch (error) {
+        console.error("Failed to update conversations:", error);
+      }
     };
 
     socketRef.current.on("new_message", handleNewMessage);
