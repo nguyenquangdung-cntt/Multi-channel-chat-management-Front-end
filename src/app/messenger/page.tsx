@@ -25,6 +25,7 @@ export default function Page() {
   const [showStatusIndex, setShowStatusIndex] = useState<number | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const storedPages = localStorage.getItem("fb_pages");
@@ -147,7 +148,7 @@ export default function Page() {
   
     } catch (err: any) {
       console.error("Gửi tin nhắn thất bại:", err.message);
-      alert("❗ Lỗi hệ thống: Không thể gửi tin nhắn.");
+      setErrorMessage("Tin nhắn này được gửi ngoài khoảng thời gian cho phép (24h) và không thể gửi.Vui lòng yêu cầu người dùng nhắn tin trước.");
       setMessageStatus("error");
     } finally {
       setTimeout(() => {
@@ -278,6 +279,11 @@ export default function Page() {
                   </div>
                 ))
               ) : null}
+              {errorMessage && (
+                <div className="text-red-600 text-sm mt-2 self-end">
+                  ⚠️ {errorMessage}
+                </div>
+              )}
             </div>
 
             {/* Ô nhập tin nhắn - Luôn cố định dưới */}
@@ -401,6 +407,11 @@ export default function Page() {
                 </div>
               ))
             ) : null}
+            {errorMessage && (
+              <div className="text-red-600 text-sm mt-2 self-end">
+                ⚠️ {errorMessage}
+              </div>
+            )}
         </div>
 
         <div className="p-4 flex items-center gap-2 bg-white">
