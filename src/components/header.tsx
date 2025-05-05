@@ -17,7 +17,7 @@ export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-  const [tokenExpired, setTokenExpired] = useState(false); // ⬅️ new
+  const [tokenExpired, setTokenExpired] = useState(false);
 
   useEffect(() => {
     window.fbAsyncInit = function () {
@@ -58,7 +58,6 @@ export default function Header() {
       setUser(JSON.parse(savedUser));
     }
 
-    // 🔁 Check token every 5 minutes
     const interval = setInterval(() => {
       window.FB.getLoginStatus((res: any) => {
         if (res.status !== "connected") {
@@ -101,7 +100,7 @@ export default function Header() {
                     localStorage.setItem("fb_pages", JSON.stringify(pages));
                     setUser(userInfo);
                     setIsModalOpen(false);
-                    setTokenExpired(false); // ⬅️ clear expired modal
+                    setTokenExpired(false);
                     window.location.reload();
                   } else {
                     alert("Bạn chưa quản lý trang nào.");
@@ -156,25 +155,23 @@ export default function Header() {
     <>
       {loading && (
         <div className="fixed inset-0 bg-white bg-opacity-70 flex items-center justify-center z-[9999]">
-          {/* Spinner với nhiều vòng tròn quay ngược nhau */}
           <div className="relative w-20 h-20 flex items-center justify-center">
             <div className="absolute w-20 h-20 rounded-full border-4 border-[#1877F2] border-t-transparent animate-spin"></div>
             <div className="absolute w-16 h-16 rounded-full border-4 border-[#166FE5] border-b-transparent animate-spin-reverse"></div>
             <div className="absolute w-12 h-12 rounded-full border-4 border-[#3b5998] border-t-transparent animate-spin"></div>
           </div>
 
-          {/* Những shape bay xung quanh màn hình */}
           <div className="absolute inset-0 overflow-hidden">
             {Array.from({ length: 12 }).map((_, i) => (
               <div
                 key={i}
                 className="absolute rounded-full"    
                 style={{
-                  width: `${Math.random() * 10 + 8}px`, // Kích thước từ 4px đến 12px
+                  width: `${Math.random() * 10 + 8}px`,
                   height: `${Math.random() * 10 + 8}px`,
                   backgroundColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(
                     Math.random() * 255
-                  )}, ${Math.floor(Math.random() * 255)}, ${Math.random() * 0.5 + 0.5})`, // Màu ngẫu nhiên với độ đậm nhạt khác nhau
+                  )}, ${Math.floor(Math.random() * 255)}, ${Math.random() * 0.5 + 0.5})`,
                   top: `${Math.random() * 100}%`,
                   left: `${Math.random() * 100}%`,
                   animation: `floating ${Math.random() * 4 + 2}s infinite alternate ease-in-out`,
@@ -218,7 +215,7 @@ export default function Header() {
               className="bg-blue-700 text-white rounded-[50px] px-4 py-1 transition cursor-pointer"
               onClick={() => setIsModalOpen(true)}
             >
-              <FontAwesomeIcon icon={faRightToBracket} className="mr-[5px]"/> Sign in
+              <FontAwesomeIcon icon={faRightToBracket} className="mr-[5px]"/> Log in
             </button>
           )}
         </div>
@@ -230,7 +227,7 @@ export default function Header() {
             <div className="flex justify-between items-center mb-4">
               <FontAwesomeIcon icon={faCircleUser} className="text-[20px]"/> 
               <h2 className="text-xl font-semibold">
-                {tokenExpired ? "Phiên đăng nhập đã hết hạn" : "Sign in"}
+                {tokenExpired ? "Phiên đăng nhập đã hết hạn" : "Log in"}
               </h2>
               <span
                 className="text-[25px] cursor-pointer text-gray-600 hover:text-red-600"
@@ -246,7 +243,7 @@ export default function Header() {
               className="w-full bg-blue-600 text-white py-2 rounded cursor-pointer hover:bg-blue-700"
               onClick={handleLogin}
             >
-              <FontAwesomeIcon icon={faFacebook} className="text-white" /> Đăng nhập với Facebook
+              <FontAwesomeIcon icon={faFacebook} className="text-white" /> Log in with Facebook
             </button>
           </div>
         </div>

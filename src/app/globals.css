@@ -81,3 +81,33 @@ header {
     height: 600px;
   }
 }
+
+@keyframes floating {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes floating-spin {
+  0% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(20deg); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+
+@keyframes floating-glow {
+  0% { transform: translateY(0); filter: brightness(1); }
+  50% { transform: translateY(-10px); filter: brightness(1.3); }
+  100% { transform: translateY(0); filter: brightness(1); }
+}
+
+.animate-floating {
+  animation: floating 3s infinite ease-in-out;
+}
+
+.animate-floating-spin {
+  animation: floating-spin 4s infinite ease-in-out;
+}
+
+.animate-floating-glow {
+  animation: floating-glow 4s infinite ease-in-out;
+}

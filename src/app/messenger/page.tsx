@@ -11,7 +11,6 @@ import slide1 from "../../../public/images/slide-1.png";
 import slide2 from "../../../public/images/slide-2.png";
 import slide3 from "../../../public/images/slide-3.png";
 
-
 type User = { id: string; name: string };
 type Message = { from: "user" | "bot"; text: string; pending?: boolean; error?: boolean };
 type Messages = { [userId: string]: Message[] };
@@ -24,7 +23,6 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 export default function Page() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // Function to check login status
   const checkLogin = () => {
     const storedUser = localStorage.getItem("fb_user");
     setIsLoggedIn(!!storedUser);
@@ -60,17 +58,13 @@ export default function Page() {
       socketRef.current = io(API_URL);
     }
 
-    // Join room theo pageID
     socketRef.current.emit("join_page", selectedPage.id);
 
-    // Lắng nghe sự kiện new_message
     const handleNewMessage = (data: any) => {
-      console.log("New message received:", data); // Debug log
       if (data.pageID !== selectedPage.id) return;
 
       setMessages((prev) => {
         const arr = prev[data.recipientID] || [];
-        // Tránh duplicate tin nhắn
         if (arr[0] && arr[0].text === data.message && arr[0].from === data.from) {
           return prev;
         }
@@ -83,13 +77,11 @@ export default function Page() {
         };
       });
 
-      // Tự động cuộn xuống cuối nếu đang xem đúng user
       if (selectedUser?.id === data.recipientID) {
         scrollToBottom();
       }
     };
 
-    // Lắng nghe sự kiện update_conversations
     const handleUpdateConversations = async (data: any) => {
       if (data.pageID !== selectedPage?.id) return;
 
@@ -112,7 +104,6 @@ export default function Page() {
           }
         }
 
-        // Merge new messages with existing ones
         setMessages((prev) => {
           const mergedMessages = { ...prev };
           for (const userId in newMessages) {
@@ -224,11 +215,10 @@ export default function Page() {
 
     const userMessage: Message = { from: "bot", text: input };
 
-    // Add the message to the UI immediately and mark it as "pending"
     setMessages((prev) => ({
       ...prev,
       [selectedUser.id]: [
-        { ...userMessage, pending: true }, // Add a pending flag
+        { ...userMessage, pending: true },
         ...(prev[selectedUser.id] || []),
       ],
     }));
@@ -260,7 +250,6 @@ export default function Page() {
         }
         setMessageStatus("error");
 
-        // Update the message to indicate an error
         setMessages((prev) => ({
           ...prev,
           [selectedUser.id]: prev[selectedUser.id].map((msg) =>
@@ -272,7 +261,6 @@ export default function Page() {
       } else {
         setMessageStatus("sent");
 
-        // Update the message to remove the "pending" flag
         setMessages((prev) => ({
           ...prev,
           [selectedUser.id]: prev[selectedUser.id].map((msg) =>
@@ -286,7 +274,6 @@ export default function Page() {
       console.error("Gửi tin nhắn thất bại:", err.message);
       setMessageStatus("error");
 
-      // Update the message to indicate an error
       setMessages((prev) => ({
         ...prev,
         [selectedUser.id]: prev[selectedUser.id].map((msg) =>
@@ -325,7 +312,6 @@ export default function Page() {
     <div id="content-chat" className="flex sm:h-[1180px] h-screen w-full">
       {isLoggedIn ? (
         <>
-          {/* 📌 Mobile: Dropdown + User List */}
           <div className="w-full h-screen bg-gray-100 sm:hidden">
             <div className="h-[70px]"></div>
             <div className="px-4">
@@ -345,11 +331,10 @@ export default function Page() {
               )}
             </div>
 
-            {/* Danh sách User */}
             <div className="overflow-y-auto mt-4">
               {loadingUsers ? (
                 [...Array(5)].map((_, i) => (
-                  <div key={i} className="h-screen bg-gray-300 animate-pulse"></div>
+                  <div key={i} className="bg-gray-300 animate-pulse border mt-[5px]"></div>
                 ))
               ) : (
                 users.map((user) => (
@@ -364,12 +349,9 @@ export default function Page() {
               )}
             </div>
           </div>
-          {/* Modal */}
           {isModalOpen && (
             <div className="fixed inset-0 bg-white flex items-center justify-center z-50 mt-[]">
               <div className="relative w-full max-w-3xl bg-white rounded-lg shadow-lg flex flex-col h-screen pt-[30px]">
-                
-                {/* Header Modal - Luôn cố định trên cùng */}
                 <div className="p-4 font-semibold text-lg bg-blue-700 text-white flex justify-between items-center flex-none">
                   <span>{selectedUser?.name || "Messenger"}</span>
                   <button onClick={() => setIsModalOpen(false)} className="text-white text-2xl hover:text-red-400 transition">
@@ -377,7 +359,6 @@ export default function Page() {
                   </button>
                 </div>
 
-                {/* Nội dung Chat - Chỉ phần này được scroll */}
                 <div className="flex-1 h-0 p-4 overflow-y-auto flex flex-col-reverse space-y-reverse space-y-2 bg-gray-50 pb-[50px]">
                   {selectedUser?.id === errorUserId && errorMessage && (
                     <div className="text-red-600 text-sm mt-2 self-end">
@@ -433,7 +414,6 @@ export default function Page() {
                   ) : null}
                 </div>
 
-                {/* Ô nhập tin nhắn - Luôn cố định dưới */}
                 <div className="p-4 flex items-center gap-2 bg-white border-t border-gray-300 flex-none sticky bottom-0 w-full max-w-3xl">
                   <input
                     type="text"
@@ -453,20 +433,27 @@ export default function Page() {
                     <FontAwesomeIcon icon={faPaperPlane} />
                   </button>
                 </div>
-
               </div>
             </div>
           )}     
         </>
       ) : (
-        <div className="sm:hidden flex-1 flex items-center justify-center bg-gray-100">
+        <div className="sm:hidden items-center justify-center bg-gray-100 h-screen">
           <div className="h-[70px]"></div>
-          <p className="text-gray-500 text-lg">Please log in to access the chat.</p>
+          <div className="p-6">
+            <img src={slide2.src} alt="Hình minh họa" className="w-full object-cover mt-10" />
+            <div className="absolute top-[20%] left-5 w-8 h-8 bg-blue-300 rounded-full animate-floating-spin"></div>
+            <div className="absolute top-20 right-10 w-12 h-12 bg-red-300 rounded-lg animate-floating-glow"></div>
+            <div className="absolute bottom-28 left-20 w-10 h-10 bg-yellow-300 rounded-full animate-floating-spin"></div>
+            <div className="absolute top-[55%] left-[15%] w-10 h-10 bg-green-300 rounded-xl animate-floating-glow"></div>
+            <div className="absolute top-[40%] right-[25%] w-6 h-6 bg-purple-400 rounded-full animate-floating-spin"></div>
+            <div className="absolute bottom-[10%] right-[10%] w-14 h-14 bg-indigo-300 rounded-lg animate-floating-glow"></div>
+          </div>
+          <p className="text-gray-500 text-lg text-center">Please log in to access the chat.</p>
         </div>
       )}
       {isLoggedIn ? (
         <>
-          {/* Sidebar */}
           <aside className="hidden sm:block w-64 bg-gray-100 p-4 space-y-2 overflow-y-auto">
             {pages.length > 0 && (
               <div className="sticky top-0 bg-gray-100 pb-2 z-10">
@@ -508,7 +495,6 @@ export default function Page() {
             )}
           </aside>
 
-          {/* Main Chat */}
           <main className="hidden sm:flex flex-1 flex-col bg-white">
             <div className="p-4 font-semibold text-lg bg-blue-700 text-white">
               {selectedUser?.name || "Messenger"}
@@ -611,7 +597,6 @@ export default function Page() {
             </SwiperSlide>
           </Swiper>
 
-          {/* Thông báo đăng nhập */}
           <p className="text-gray-500 text-lg mt-4">Please log in to access the chat.</p>
         </div>
       )}

@@ -20,7 +20,6 @@ export default function Sidebar({ isOpen, toggle }: SidebarProps) {
             }`}
         >
             <div className="flex items-center justify-between mb-4">
-                {/* Hình ảnh - chỉ hiển thị khi sidebar mở */}
                 {isOpen && (
                     <Image
                         src={dash}
@@ -28,8 +27,6 @@ export default function Sidebar({ isOpen, toggle }: SidebarProps) {
                         className="w-[100px] h-10"
                     />
                 )}
-
-                {/* Nút toggle */}
                 <button
                     onClick={toggle}
                     className="bg-gray-600 p-3 rounded hover:bg-gray-500 transition flex justify-center items-center"
