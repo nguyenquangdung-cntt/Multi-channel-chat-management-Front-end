@@ -246,12 +246,12 @@ export default function HeaderMobile() {
                 </div>
                 </div>
 
-            {(isModalOpen || tokenExpired) && (
+            {isModalOpen  && (
                 <div className="fixed inset-0 backdrop-blur-md backdrop-brightness-50 flex items-center justify-center z-50">
                     <div className="bg-white p-6 rounded shadow-lg w-full max-w-sm">
                       <div className="grid grid-cols-2 items-center">
                         <h2 className="text-xl font-semibold text-center text-left">
-                          <FontAwesomeIcon icon={faRightToBracket} className="mr-2" /> {tokenExpired ? "The login session has expired" : "log in"}
+                          <FontAwesomeIcon icon={faRightToBracket} className="mr-2" /> log in
                         </h2>
                         <button onClick={() => setIsModalOpen(false)} className="mt-2 w-full text-gray-600 hover:text-red-600 text-right">
                             ✕

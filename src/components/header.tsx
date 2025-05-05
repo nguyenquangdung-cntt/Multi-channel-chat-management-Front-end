@@ -221,19 +221,19 @@ export default function Header() {
         </div>
       </header>
 
-      {(isModalOpen || tokenExpired) && (
+      {isModalOpen && (
         <div className="fixed inset-0 backdrop-blur-md backdrop-brightness-50 flex items-center justify-center z-50">
           <div id="modal" className="bg-white p-6 rounded shadow-lg w-full max-w-sm">
             <div className="flex justify-between items-center mb-4">
               <FontAwesomeIcon icon={faCircleUser} className="text-[20px]"/> 
               <h2 className="text-xl font-semibold">
-                {tokenExpired ? "The login session has expired" : "Log in"}
+               Log in
               </h2>
               <span
                 className="text-[25px] cursor-pointer text-gray-600 hover:text-red-600"
                 onClick={() => {
                   setIsModalOpen(false);
-                  setTokenExpired(false);
+                  // setTokenExpired(false);
                 }}
               >
                 ×
