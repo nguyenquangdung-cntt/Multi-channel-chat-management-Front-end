@@ -11,7 +11,7 @@ import slide1 from "../../../public/images/slide-1.png";
 import slide2 from "../../../public/images/slide-2.png";
 import slide3 from "../../../public/images/slide-3.png";
 
-type User = { id: string; name: string };
+type User = { id: string; name: string; hasNewMessage?: boolean };
 type Message = { from: "user" | "bot"; text: string; pending?: boolean; error?: boolean };
 type Messages = { [userId: string]: Message[] };
 type Page = { id: string; name: string };
@@ -61,7 +61,7 @@ export default function Page() {
     socketRef.current.emit("join_page", selectedPage.id);
 
     const handleNewMessage = (data: any) => {
-      if (data.pageID !== selectedPage.id) return;
+      if (data.pageID !== selectedPage?.id) return;
 
       setMessages((prev) => {
         const arr = prev[data.recipientID] || [];
@@ -76,6 +76,14 @@ export default function Page() {
           ],
         };
       });
+
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user.id === data.recipientID
+            ? { ...user, hasNewMessage: selectedUser?.id !== user.id }
+            : user
+        )
+      );
 
       if (selectedUser?.id === data.recipientID) {
         scrollToBottom();
@@ -195,6 +203,11 @@ export default function Page() {
 
   const handleSelectUser = (user: User) => {
     setSelectedUser(user);
+    setUsers((prevUsers) =>
+      prevUsers.map((u) =>
+        u.id === user.id ? { ...u, hasNewMessage: false } : u
+      )
+    );
     setLoadingMessages(true);
     setTimeout(() => {
       setLoadingMessages(false);
@@ -203,6 +216,11 @@ export default function Page() {
 
   const handleSelectUserMobile = (user: User) => {
     setSelectedUser(user);
+    setUsers((prevUsers) =>
+      prevUsers.map((u) =>
+        u.id === user.id ? { ...u, hasNewMessage: false } : u
+      )
+    );
     setLoadingMessages(true);
     setTimeout(() => {
       setLoadingMessages(false);
@@ -341,9 +359,14 @@ export default function Page() {
                   <div
                     key={user.id}
                     onClick={() => handleSelectUserMobile(user)}
-                    className="p-4 cursor-pointer hover:bg-blue-200 border border-gray-300"
+                    className={`p-4 cursor-pointer hover:bg-blue-200 border border-gray-300 flex items-center justify-between`}
                   >
-                    {user.name}
+                    <span className={user.hasNewMessage ? "font-bold" : ""}>
+                      {user.name}
+                    </span>
+                    {user.hasNewMessage && (
+                      <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                    )}
                   </div>
                 ))
               )}
@@ -483,13 +506,18 @@ export default function Page() {
                 <div
                   key={user.id}
                   onClick={() => handleSelectUser(user)}
-                  className={`p-2 px-4 rounded-r-[50px] cursor-pointer ${
+                  className={`p-2 px-4 rounded-r-[50px] cursor-pointer flex items-center justify-between ${
                     selectedUser?.id === user.id
-                      ? "bg-blue-700 text-white"
+                      ? "bg-blue-700 text-white font-bold"
                       : "hover:bg-blue-200"
                   }`}
                 >
-                  {user.name}
+                  <span className={user.hasNewMessage ? "font-bold" : ""}>
+                    {user.name}
+                  </span>
+                  {user.hasNewMessage && (
+                    <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                  )}
                 </div>
               ))
             )}
