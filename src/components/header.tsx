@@ -227,7 +227,7 @@ export default function Header() {
             <div className="flex justify-between items-center mb-4">
               <FontAwesomeIcon icon={faCircleUser} className="text-[20px]"/> 
               <h2 className="text-xl font-semibold">
-                {tokenExpired ? "Phiên đăng nhập đã hết hạn" : "Log in"}
+                {tokenExpired ? "The login session has expired" : "Log in"}
               </h2>
               <span
                 className="text-[25px] cursor-pointer text-gray-600 hover:text-red-600"

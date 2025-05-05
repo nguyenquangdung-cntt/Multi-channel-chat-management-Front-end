@@ -251,7 +251,7 @@ export default function HeaderMobile() {
                     <div className="bg-white p-6 rounded shadow-lg w-full max-w-sm">
                       <div className="grid grid-cols-2 items-center">
                         <h2 className="text-xl font-semibold text-center text-left">
-                          <FontAwesomeIcon icon={faRightToBracket} className="mr-2" /> {tokenExpired ? "Phiên đăng nhập đã hết hạn" : "log in"}
+                          <FontAwesomeIcon icon={faRightToBracket} className="mr-2" /> {tokenExpired ? "The login session has expired" : "log in"}
                         </h2>
                         <button onClick={() => setIsModalOpen(false)} className="mt-2 w-full text-gray-600 hover:text-red-600 text-right">
                             ✕
