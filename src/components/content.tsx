@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function ChatUI() {
   return (
-    <div id="home" className="flex h-screen md:h-[600px] lg:h-[600px] xl:h-[1180px] w-full bg-white items-center justify-center p-4">
+    <div id="home" className="flex h-screen md:h-[600px] lg:h-[600px] xl:h-[605px] w-full bg-white items-center justify-center p-4">
       <Image
         src={logo}
         alt="Logo"
