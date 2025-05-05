@@ -596,7 +596,11 @@ export default function Page() {
               <img src={slide3.src} alt="Hình 3" className="w-full object-cover" />
             </SwiperSlide>
           </Swiper>
-
+          <div className="absolute top-24 left-[40%] w-10 h-10 bg-blue-300 rounded-full animate-floating"></div>
+          <div className="absolute top-32 right-24 w-16 h-16 bg-red-300 rounded-lg animate-floating-spin"></div>
+          <div className="absolute bottom-20 left-80 w-12 h-12 bg-yellow-300 rounded-full animate-floating"></div>
+          <div className="absolute top-[40%] left-[25%] w-14 h-14 bg-green-300 rounded-xl animate-floating-slow"></div>
+          <div className="absolute bottom-[10%] right-[10%] w-20 h-20 bg-indigo-300 rounded-lg animate-floating-glow"></div>
           <p className="text-gray-500 text-lg mt-4">Please log in to access the chat.</p>
         </div>
       )}
