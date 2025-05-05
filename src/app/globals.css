@@ -111,3 +111,10 @@ header {
 .animate-floating-glow {
   animation: floating-glow 4s infinite ease-in-out;
 }
+
+
+@media (width = 1440px) {
+  #home{
+    height: 1180px;
+  }
+}
