@@ -196,7 +196,7 @@ export default function HeaderMobile() {
                     </div>
                 </div>
             )}
-            <header className="fixed top-0 left-0 w-full bg-gray-800 text-white flex justify-between items-center px-4 py-3 z-50 sm:hidden border-b">
+            <header className="fixed top-0 left-0 w-full bg-gray-800 text-white flex justify-between items-center px-4 py-3 z-50 sm:hidden" style={{boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.3)"}}>
                 <button onClick={toggleSidebar} className="text-white text-xl border py-1 px-2 bg-blue-500 rounded">
                     <FontAwesomeIcon icon={faBars} />
                 </button>

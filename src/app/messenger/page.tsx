@@ -438,7 +438,7 @@ export default function Page() {
           )}     
         </>
       ) : (
-        <div className="sm:hidden items-center justify-center bg-gray-100 h-screen">
+        <div className="sm:hidden items-center justify-center bg-white h-screen">
           <div className="h-[70px]"></div>
           <div className="p-6">
             <img src={slide2.src} alt="Hình minh họa" className="w-full object-cover mt-10" />
