@@ -584,7 +584,7 @@ export default function Page() {
             slidesPerView={1}
             navigation
             autoplay={{ delay: 5000, disableOnInteraction: false }}
-            className="xxl:w-[800px] xl:w-[500px] lg:w-[300px] md:w-[400px]"
+            className="slider xl:w-[500px] lg:w-[300px] md:w-[400px]"
           >
             <SwiperSlide>
               <img src={slide1.src} alt="Hình 1" className="w-full object-cover" />
