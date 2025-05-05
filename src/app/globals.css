@@ -65,6 +65,11 @@ header {
   border-radius: 50px;
   background-color: white;
   box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
+  display: none;
+}
+
+.slider:hover .swiper-button-prev, .slider:hover .swiper-button-next{
+  display: block;
 }
 
 .swiper-button-prev::after{
