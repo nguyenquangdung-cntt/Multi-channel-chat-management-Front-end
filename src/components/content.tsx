@@ -12,12 +12,10 @@ export default function ChatUI() {
         alt="Logo"
         className="w-[200px] h-[40px] sm:w-[150px] sm:h-[30px] xs:w-[120px] xs:h-[24px]"
       />
+      <div className="sm:hidden block">
         <div className="absolute top-[20%] left-5 w-8 h-8 bg-blue-300 rounded-full animate-floating-spin"></div>
         <div className="absolute top-20 right-10 w-12 h-12 bg-red-300 rounded-lg animate-floating-glow"></div>
-        <div className="absolute bottom-28 left-20 w-10 h-10 bg-yellow-300 rounded-full animate-floating-spin"></div>
-        <div className="absolute top-[55%] left-[15%] w-10 h-10 bg-green-300 rounded-xl animate-floating-glow"></div>
-        <div className="absolute top-[40%] right-[25%] w-6 h-6 bg-purple-400 rounded-full animate-floating-spin"></div>
-        <div className="absolute bottom-[10%] right-[10%] w-14 h-14 bg-indigo-300 rounded-lg animate-floating-glow"></div>
+        <div className="absolute bottom-32 left-20 w-10 h-10 bg-yellow-300 rounded-full animate-floating-spin"></div>
         <div className="absolute bottom-[30%] right-[15%] w-12 h-12 flex items-center justify-center bg-blue-500 text-white rounded-full animate-floating">
           <FontAwesomeIcon icon={faFacebook} className="text-2xl" />
         </div>
@@ -27,6 +25,7 @@ export default function ChatUI() {
         <div className="absolute top-[20%] right-[40%] w-12 h-12 flex items-center justify-center bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 text-white rounded-full animate-floating-spin">
           <FontAwesomeIcon icon={faInstagram} className="text-2xl" />
         </div>
+      </div>
     </div>
   );
 }
