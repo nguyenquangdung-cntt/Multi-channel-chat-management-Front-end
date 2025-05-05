@@ -69,7 +69,7 @@ header {
 }
 
 .slider:hover .swiper-button-prev, .slider:hover .swiper-button-next{
-  display: flex;
+  display: flex !important;
 }
 
 .swiper-button-prev::after{
