@@ -16,7 +16,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <title>Messenger Chat UI</title>
+        <title>MetaLink</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="description" content="Cầu nối đỉnh cao giữa bạn và khách hàng trên Meta" />
       </head>
       <body>
         <main id="main" className="sm:h-[1211px] h-screen flex flex-col">

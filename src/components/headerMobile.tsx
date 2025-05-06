@@ -202,7 +202,7 @@ export default function HeaderMobile() {
                 </button>
 
                 <Link href={"/"}>
-                    <Image src={logo} alt="Logo" width={100} height={30} className="object-contain" />
+                    <Image src={logo} alt="Logo" width={150} height={40} className="object-contain" />
                 </Link>
             </header>
 
