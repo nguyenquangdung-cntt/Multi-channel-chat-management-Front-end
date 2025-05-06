@@ -185,7 +185,7 @@ export default function Header() {
       <header>
         <div className=" flex justify-between items-center py-4 px-6">
           <Link href={"/"}>
-            <img src={logo.src} alt="Logo" className="w-[150px] h-[35px]" />
+            <img src={logo.src} alt="Logo" className="w-[155px] h-[30px]" />
           </Link>
 
           {user ? (

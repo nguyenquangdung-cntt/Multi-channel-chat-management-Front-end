@@ -24,7 +24,7 @@ export default function Sidebar({ isOpen, toggle }: SidebarProps) {
                     <Image
                         src={dash}
                         alt="Logo"
-                        className="w-[150px] h-[30px]"
+                        className="w-[155px] h-[25px]"
                     />
                 )}
                 <button
