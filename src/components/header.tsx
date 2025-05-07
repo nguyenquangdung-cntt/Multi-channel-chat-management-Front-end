@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faRightToBracket, faCircleUser } from '@fortawesome/free-solid-svg-icons'; 
+import { faRightToBracket, faCircleUser, faBell } from '@fortawesome/free-solid-svg-icons'; 
 import { faFacebook } from '@fortawesome/free-brands-svg-icons';
 import logo from "../../public/images/logo.png";
 import Link from "next/link";
@@ -18,6 +18,7 @@ export default function Header() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [tokenExpired, setTokenExpired] = useState(false);
+  const [notification, setNotification] = useState<{ userName: string; message: string } | null>(null);
 
   useEffect(() => {
     window.fbAsyncInit = function () {
@@ -70,6 +71,25 @@ export default function Header() {
     }, 5 * 60 * 1000);
 
     return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const handleNewMessage = (data: any) => {
+      if (data?.userName) {
+        setNotification({
+          userName: data.userName,
+          message: "Đã gửi tin nhắn cho bạn",
+        });
+        setTimeout(() => setNotification(null), 5000); // Clear notification after 5 seconds
+      }
+    };
+
+    // Simulate receiving a new message (replace with real-time logic)
+    window.addEventListener("newMessage", (e: any) => handleNewMessage(e.detail));
+
+    return () => {
+      window.removeEventListener("newMessage", (e: any) => handleNewMessage(e.detail));
+    };
   }, []);
 
   const handleLogin = () => {
@@ -190,6 +210,17 @@ export default function Header() {
 
           {user ? (
             <div className="relative flex items-center space-x-4">
+              {/* Notification Bell */}
+              <div className="hidden sm:flex items-center relative">
+                <FontAwesomeIcon icon={faBell} className="text-xl text-gray-600 cursor-pointer" />
+                {notification && (
+                  <div className="absolute top-8 right-0 bg-white shadow-lg rounded-lg p-4 w-64 z-50">
+                    <p className="font-bold">{notification.userName}</p>
+                    <p className="text-sm text-gray-600">{notification.message}</p>
+                  </div>
+                )}
+              </div>
+
               <p className="font-bold">{user.name}</p>
               <div className="relative">
                 <img
