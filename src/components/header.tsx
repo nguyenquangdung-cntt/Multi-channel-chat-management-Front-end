@@ -18,7 +18,8 @@ export default function Header() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [tokenExpired, setTokenExpired] = useState(false);
-  const [notification, setNotification] = useState<{ userName: string; message: string } | null>(null);
+  const [notifications, setNotifications] = useState<{ userName: string; message: string }[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
     window.fbAsyncInit = function () {
@@ -76,11 +77,10 @@ export default function Header() {
   useEffect(() => {
     const handleNewMessage = (data: any) => {
       if (data?.userName) {
-        setNotification({
-          userName: data.userName,
-          message: "Đã gửi tin nhắn cho bạn",
-        });
-        setTimeout(() => setNotification(null), 5000); // Clear notification after 5 seconds
+        setNotifications((prev) => [
+          ...prev,
+          { userName: data.userName, message: "Đã gửi tin nhắn cho bạn" },
+        ]);
       }
     };
 
@@ -91,6 +91,11 @@ export default function Header() {
       window.removeEventListener("newMessage", (e: any) => handleNewMessage(e.detail));
     };
   }, []);
+
+  const clearNotifications = () => {
+    setNotifications([]);
+    setShowDropdown(false);
+  };
 
   const handleLogin = () => {
     window.FB.login(
@@ -212,11 +217,35 @@ export default function Header() {
             <div className="relative flex items-center space-x-4">
               {/* Notification Bell */}
               <div className="hidden sm:flex items-center relative">
-                <FontAwesomeIcon icon={faBell} className="text-xl text-gray-600 cursor-pointer" />
-                {notification && (
+                <div
+                  className="relative cursor-pointer"
+                  onClick={() => setShowDropdown(!showDropdown)}
+                >
+                  <FontAwesomeIcon icon={faBell} className="text-xl text-gray-600" />
+                  {notifications.length > 0 && (
+                    <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full"></span>
+                  )}
+                </div>
+                {showDropdown && (
                   <div className="absolute top-8 right-0 bg-white shadow-lg rounded-lg p-4 w-64 z-50">
-                    <p className="font-bold">{notification.userName}</p>
-                    <p className="text-sm text-gray-600">{notification.message}</p>
+                    {notifications.length > 0 ? (
+                      <>
+                        {notifications.map((notification, index) => (
+                          <div key={index} className="mb-2">
+                            <p className="font-bold">{notification.userName}</p>
+                            <p className="text-sm text-gray-600">{notification.message}</p>
+                          </div>
+                        ))}
+                        <button
+                          onClick={clearNotifications}
+                          className="text-blue-500 text-sm mt-2 hover:underline"
+                        >
+                          Clear all
+                        </button>
+                      </>
+                    ) : (
+                      <p className="text-sm text-gray-600">No new notifications</p>
+                    )}
                   </div>
                 )}
               </div>
