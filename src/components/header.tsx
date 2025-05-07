@@ -86,6 +86,7 @@ export default function Header() {
           ...prev,
           { userName: data.recipientID, message: "Đã gửi tin nhắn cho bạn" },
         ]);
+        setShowDropdown(true); // Automatically show the dropdown when a new message arrives
       }
     });
 
