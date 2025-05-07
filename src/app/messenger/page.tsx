@@ -412,7 +412,15 @@ export default function Page() {
                   </button>
                 </div>
 
-                <div className="flex-1 h-0 p-4 overflow-y-auto flex flex-col-reverse space-y-reverse space-y-2 bg-gray-50 pb-[50px]">
+                <div className="flex-1 h-0 p-4 overflow-y-auto flex flex-col space-y-2 bg-gray-50 pb-[50px]">
+                  {hasMoreMessages && (
+                    <button
+                      onClick={handleLoadMoreMessages}
+                      className="self-center text-blue-500 text-sm hover:underline mb-2"
+                    >
+                      Load More Messages
+                    </button>
+                  )}
                   {selectedUser?.id === errorUserId && errorMessage && (
                     <div className="text-red-600 text-sm mt-2 self-end">
                       ⚠️ {errorMessage}
@@ -427,14 +435,6 @@ export default function Page() {
                         <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
                       </div>
                     </div>
-                  )}
-                  {hasMoreMessages && (
-                    <button
-                      onClick={handleLoadMoreMessages}
-                      className="self-center text-blue-500 text-sm hover:underline mb-2"
-                    >
-                      Load More Messages
-                    </button>
                   )}
                   {loadingMessages ? (
                     [...Array(6)].map((_, i) => (
@@ -566,7 +566,15 @@ export default function Page() {
               {selectedUser?.name || "Messenger"}
             </div>
 
-            <div className="flex-1 h-0 p-4 overflow-y-auto flex flex-col-reverse space-y-reverse space-y-2 bg-gray-50">
+            <div className="flex-1 h-0 p-4 overflow-y-auto flex flex-col space-y-2 bg-gray-50">
+              {hasMoreMessages && (
+                <button
+                  onClick={handleLoadMoreMessages}
+                  className="self-center text-blue-500 text-sm hover:underline mb-2"
+                >
+                  Load More Messages
+                </button>
+              )}
               {selectedUser?.id === errorUserId && errorMessage && (
                 <div className="text-red-600 text-sm mt-2 self-end">
                   ⚠️ {errorMessage}
@@ -581,14 +589,6 @@ export default function Page() {
                     <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
                   </div>
                 </div>
-              )}
-              {hasMoreMessages && (
-                <button
-                  onClick={handleLoadMoreMessages}
-                  className="self-center text-blue-500 text-sm hover:underline mb-2"
-                >
-                  Load More Messages
-                </button>
               )}
               {loadingMessages ? (
                 [...Array(6)].map((_, i) => (
