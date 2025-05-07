@@ -81,7 +81,7 @@ export default function Header() {
     setSocket(newSocket);
 
     newSocket.on("new_message", (data: any) => {
-      console.log("New message received:", data); // Log for debugging
+      console.log("New message received on frontend:", data); // Log the received data
       if (data?.recipientID && data?.message) {
         setNotifications((prev) => [
           ...prev,
