@@ -215,7 +215,6 @@ export default function Header() {
                           </div>
                         ))}
                         <button
-                          onClick={clearNotifications}
                           className="text-blue-500 text-sm mt-2 hover:underline"
                         >
                           Clear all
