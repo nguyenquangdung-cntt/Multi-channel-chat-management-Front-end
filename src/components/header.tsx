@@ -21,7 +21,6 @@ export default function Header() {
   const [tokenExpired, setTokenExpired] = useState(false);
   const [notifications, setNotifications] = useState<{ userName: string; message: string }[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
     window.fbAsyncInit = function () {
@@ -75,30 +74,6 @@ export default function Header() {
 
     return () => clearInterval(interval);
   }, []);
-
-  useEffect(() => {
-    const newSocket = io(process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000");
-    setSocket(newSocket);
-
-    newSocket.on("new_message", (data: any) => {
-      if (data?.recipientID && data?.message) {
-        setNotifications((prev) => [
-          ...prev,
-          { userName: data.recipientID, message: "Đã gửi tin nhắn cho bạn" },
-        ]);
-        setShowDropdown(true);
-      }
-    });
-
-    return () => {
-      newSocket.disconnect();
-    };
-  }, []);
-
-  const clearNotifications = () => {
-    setNotifications([]);
-    setShowDropdown(false);
-  };
 
   const handleLogin = () => {
     window.FB.login(
