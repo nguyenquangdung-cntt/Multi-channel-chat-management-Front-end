@@ -81,13 +81,12 @@ export default function Header() {
     setSocket(newSocket);
 
     newSocket.on("new_message", (data: any) => {
-      console.log("New message received on frontend:", data); // Log the received data
       if (data?.recipientID && data?.message) {
         setNotifications((prev) => [
           ...prev,
           { userName: data.recipientID, message: "Đã gửi tin nhắn cho bạn" },
         ]);
-        setShowDropdown(true); // Automatically show the dropdown when a new message arrives
+        setShowDropdown(true);
       }
     });
 
