@@ -19,6 +19,7 @@ type Page = { id: string; name: string };
 const initialMessages: Messages = {};
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const MESSAGE_LIMIT = 20; // Limit the number of messages displayed initially
 
 export default function Page() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -48,6 +49,8 @@ export default function Page() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [errorUserId, setErrorUserId] = useState<string | null>(null);
+  const [messageOffset, setMessageOffset] = useState(0); // Track the offset for fetching older messages
+  const [hasMoreMessages, setHasMoreMessages] = useState(true); // Track if there are more messages to load
 
   const socketRef = useRef<Socket | null>(null);
 
@@ -206,6 +209,42 @@ export default function Page() {
 
     fetchSenders();
   }, [selectedPage, userID]);
+
+  const fetchMessages = async (offset: number) => {
+    if (!selectedPage || !selectedUser) return;
+
+    try {
+      const res = await fetch(
+        `${API_URL}/api/facebook-auth/${userID}/${selectedPage.id}/messages?conversationID=${selectedUser.id}&limit=${MESSAGE_LIMIT}&offset=${offset}`
+      );
+      const data = await res.json();
+
+      if (data.messages.length < MESSAGE_LIMIT) {
+        setHasMoreMessages(false); // No more messages to load
+      }
+
+      setMessages((prev) => ({
+        ...prev,
+        [selectedUser.id]: [...data.messages.reverse(), ...(prev[selectedUser.id] || [])],
+      }));
+    } catch (error) {
+      console.error("Failed to fetch messages:", error);
+    }
+  };
+
+  const handleLoadMoreMessages = () => {
+    const newOffset = messageOffset + MESSAGE_LIMIT;
+    setMessageOffset(newOffset);
+    fetchMessages(newOffset);
+  };
+
+  useEffect(() => {
+    if (selectedUser) {
+      setMessageOffset(0); // Reset offset when a new user is selected
+      setHasMoreMessages(true); // Reset the "has more" state
+      fetchMessages(0); // Fetch initial messages
+    }
+  }, [selectedUser]);
 
   const handleSelectUser = (user: User) => {
     setSelectedUser(user);
@@ -389,6 +428,14 @@ export default function Page() {
                       </div>
                     </div>
                   )}
+                  {hasMoreMessages && (
+                    <button
+                      onClick={handleLoadMoreMessages}
+                      className="self-center text-blue-500 text-sm hover:underline mb-2"
+                    >
+                      Load More Messages
+                    </button>
+                  )}
                   {loadingMessages ? (
                     [...Array(6)].map((_, i) => (
                       <div
@@ -534,6 +581,14 @@ export default function Page() {
                     <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
                   </div>
                 </div>
+              )}
+              {hasMoreMessages && (
+                <button
+                  onClick={handleLoadMoreMessages}
+                  className="self-center text-blue-500 text-sm hover:underline mb-2"
+                >
+                  Load More Messages
+                </button>
               )}
               {loadingMessages ? (
                 [...Array(6)].map((_, i) => (
