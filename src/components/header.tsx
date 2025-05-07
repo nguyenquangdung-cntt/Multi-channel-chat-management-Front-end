@@ -4,6 +4,7 @@ import { faRightToBracket, faCircleUser, faBell } from '@fortawesome/free-solid-
 import { faFacebook } from '@fortawesome/free-brands-svg-icons';
 import logo from "../../public/images/logo.png";
 import Link from "next/link";
+import { io, Socket } from "socket.io-client";
 
 declare global {
   interface Window {
@@ -20,6 +21,7 @@ export default function Header() {
   const [tokenExpired, setTokenExpired] = useState(false);
   const [notifications, setNotifications] = useState<{ userName: string; message: string }[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
     window.fbAsyncInit = function () {
@@ -75,20 +77,20 @@ export default function Header() {
   }, []);
 
   useEffect(() => {
-    const handleNewMessage = (data: any) => {
-      if (data?.userName) {
+    const newSocket = io(process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000");
+    setSocket(newSocket);
+
+    newSocket.on("new_message", (data: any) => {
+      if (data?.recipientID && data?.message) {
         setNotifications((prev) => [
           ...prev,
-          { userName: data.userName, message: "Đã gửi tin nhắn cho bạn" },
+          { userName: data.recipientID, message: "Đã gửi tin nhắn cho bạn" },
         ]);
       }
-    };
-
-    // Simulate receiving a new message (replace with real-time logic)
-    window.addEventListener("newMessage", (e: any) => handleNewMessage(e.detail));
+    });
 
     return () => {
-      window.removeEventListener("newMessage", (e: any) => handleNewMessage(e.detail));
+      newSocket.disconnect();
     };
   }, []);
 
