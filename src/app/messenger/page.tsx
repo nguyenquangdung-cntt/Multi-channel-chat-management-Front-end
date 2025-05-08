@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
+import { faPaperPlane, faCamera } from "@fortawesome/free-solid-svg-icons";
 import { io, Socket } from "socket.io-client";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay } from "swiper/modules";
@@ -450,7 +450,7 @@ export default function Page() {
                     htmlFor="image-upload"
                     className="bg-gray-200 text-gray-700 p-3 rounded-full cursor-pointer hover:bg-gray-300 transition"
                   >
-                    📷
+                    <FontAwesomeIcon icon={faCamera} />
                   </label>
                   <input
                     type="text"
@@ -609,7 +609,7 @@ export default function Page() {
                 htmlFor="image-upload"
                 className="bg-gray-200 text-gray-700 p-3 rounded-full cursor-pointer hover:bg-gray-300 transition"
               >
-                📷
+                <FontAwesomeIcon icon={faCamera} />
               </label>
               <input
                 type="text"
