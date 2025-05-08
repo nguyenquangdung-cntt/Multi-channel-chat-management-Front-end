@@ -36,6 +36,7 @@ export default function Page() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [messages, setMessages] = useState<Messages>(initialMessages);
   const [input, setInput] = useState("");
+  const [image, setImage] = useState<File | null>(null);
   const [userID, setUserID] = useState("111111111111");
   const [pages, setPages] = useState<Page[]>([]);
   const [selectedPage, setSelectedPage] = useState<Page | null>(null);
@@ -224,8 +225,15 @@ export default function Page() {
     setIsModalOpen(true);
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImage(file);
+    }
+  };
+
   const handleSend = async () => {
-    if (!input.trim() || !selectedPage || !selectedUser) return;
+    if ((!input.trim() && !image) || !selectedPage || !selectedUser) return;
 
     const userMessage: Message = { from: "bot", text: input };
 
@@ -238,17 +246,19 @@ export default function Page() {
     }));
 
     setInput("");
+    setImage(null); // Clear the image after sending
     setMessageStatus("sending");
     setShowStatusIndex(0);
 
     try {
+      const formData = new FormData();
+      formData.append("recipientID", selectedUser.id);
+      if (input.trim()) formData.append("message", input);
+      if (image) formData.append("image", image);
+
       const res = await fetch(`${API_URL}/api/facebook-auth/${userID}/${selectedPage.id}/send-message`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          recipientID: selectedUser.id,
-          message: userMessage.text,
-        }),
+        body: formData,
       });
 
       const data = await res.json();
@@ -430,6 +440,19 @@ export default function Page() {
 
                 <div className="p-4 flex items-center gap-2 bg-white border-t border-gray-300 flex-none sticky bottom-0 w-full max-w-3xl">
                   <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                    id="image-upload"
+                  />
+                  <label
+                    htmlFor="image-upload"
+                    className="bg-gray-200 text-gray-700 p-3 rounded-full cursor-pointer hover:bg-gray-300 transition"
+                  >
+                    📷
+                  </label>
+                  <input
                     type="text"
                     placeholder="Type a message..."
                     value={input}
@@ -575,6 +598,19 @@ export default function Page() {
             </div>
 
             <div className="p-4 flex items-center gap-2 bg-white">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+                id="image-upload"
+              />
+              <label
+                htmlFor="image-upload"
+                className="bg-gray-200 text-gray-700 p-3 rounded-full cursor-pointer hover:bg-gray-300 transition"
+              >
+                📷
+              </label>
               <input
                 type="text"
                 placeholder="Type a message..."
