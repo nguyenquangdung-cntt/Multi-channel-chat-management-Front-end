@@ -240,7 +240,7 @@ export default function Page() {
     setMessages((prev) => ({
       ...prev,
       [selectedUser.id]: [
-        { ...userMessage, pending: true },
+        { ...userMessage, pending: true, text: image ? "Image" : input },
         ...(prev[selectedUser.id] || []),
       ],
     }));
@@ -416,16 +416,23 @@ export default function Page() {
                           msg.from === "bot" ? "ml-auto items-end" : "mr-auto items-start"
                         }`}
                       >
-                        <div
-                          className={`px-4 py-2 rounded-2xl break-words ${
-                            msg.from === "user"
-                              ? "mr-auto bg-gray-200 text-gray-800"
-                              : "ml-auto bg-blue-500 text-white"
-                          }`}
-                        >
-                          {msg.text}
-                        </div>
-                    
+                        {msg.text === "Image" && msg.pending ? (
+                          <img
+                            src={URL.createObjectURL(image!)}
+                            alt="Sending..."
+                            className="w-32 h-32 object-cover rounded"
+                          />
+                        ) : (
+                          <div
+                            className={`px-4 py-2 rounded-2xl break-words ${
+                              msg.from === "user"
+                                ? "mr-auto bg-gray-200 text-gray-800"
+                                : "ml-auto bg-blue-500 text-white"
+                            }`}
+                          >
+                            {msg.text}
+                          </div>
+                        )}
                         {msg.from === "bot" && showStatusIndex === idx && (
                           <span className="text-xs text-gray-500 mt-1">
                             {messageStatus === "sending" && "Đang gửi..."}
@@ -452,6 +459,21 @@ export default function Page() {
                   >
                     <FontAwesomeIcon icon={faCamera} />
                   </label>
+                  {image && (
+                    <div className="flex items-center gap-2">
+                      <img
+                        src={URL.createObjectURL(image)}
+                        alt="Preview"
+                        className="w-10 h-10 object-cover rounded"
+                      />
+                      <button
+                        onClick={() => setImage(null)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  )}
                   <input
                     type="text"
                     placeholder="Type a message..."
@@ -575,16 +597,23 @@ export default function Page() {
                         msg.from === "bot" ? "ml-auto items-end" : "mr-auto items-start"
                       }`}
                     >
-                      <div
-                        className={`px-4 py-2 rounded-2xl break-words ${
-                          msg.from === "user"
-                            ? "mr-auto bg-gray-200 text-gray-800"
-                            : "ml-auto bg-blue-500 text-white"
-                        }`}
-                      >
-                        {msg.text}
-                      </div>
-                    
+                      {msg.text === "Image" && msg.pending ? (
+                        <img
+                          src={URL.createObjectURL(image!)}
+                          alt="Sending..."
+                          className="w-32 h-32 object-cover rounded"
+                        />
+                      ) : (
+                        <div
+                          className={`px-4 py-2 rounded-2xl break-words ${
+                            msg.from === "user"
+                              ? "mr-auto bg-gray-200 text-gray-800"
+                              : "ml-auto bg-blue-500 text-white"
+                          }`}
+                        >
+                          {msg.text}
+                        </div>
+                      )}
                       {msg.from === "bot" && showStatusIndex === idx && (
                         <span className="text-xs text-gray-500 mt-1">
                           {messageStatus === "sending" && "Đang gửi..."}
@@ -611,6 +640,21 @@ export default function Page() {
               >
                 <FontAwesomeIcon icon={faCamera} />
               </label>
+              {image && (
+                <div className="flex items-center gap-2">
+                  <img
+                    src={URL.createObjectURL(image)}
+                    alt="Preview"
+                    className="w-10 h-10 object-cover rounded"
+                  />
+                  <button
+                    onClick={() => setImage(null)}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
               <input
                 type="text"
                 placeholder="Type a message..."
