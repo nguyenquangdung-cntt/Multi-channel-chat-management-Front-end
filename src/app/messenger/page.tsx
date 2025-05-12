@@ -799,7 +799,7 @@ export default function Page() {
                   </div>
                 )}
               </div>
-              <div className="relative">
+              {/* <div className="relative">
                 <button
                   type="button"
                   className="bg-gray-200 text-gray-700 p-3 rounded-full hover:bg-gray-300 transition"
@@ -821,7 +821,7 @@ export default function Page() {
                     ))}
                   </div>
                 )}
-              </div>
+              </div> */}
               <input
                 type="text"
                 placeholder="Type a message..."
