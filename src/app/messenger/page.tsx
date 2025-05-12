@@ -15,7 +15,7 @@ import slide3 from "../../../public/images/slide-3.png";
 const EmojiPicker = dynamic(() => import("emoji-picker-react"), { ssr: false });
 
 type User = { id: string; name: string; hasNewMessage?: boolean; avatar?: string };
-type Message = { from: "user" | "bot"; text: string; pending?: boolean; error?: boolean; sticker?: string };
+type Message = { from: "user" | "bot"; text: string; pending?: boolean; error?: boolean; sticker?: string; image?: string };
 type Messages = { [userId: string]: Message[] };
 type Page = { id: string; name: string };
 
@@ -70,13 +70,22 @@ export default function Page() {
 
       setMessages((prev) => {
         const arr = prev[data.recipientID] || [];
-        if (arr[0] && arr[0].text === data.message && arr[0].from === data.from) {
+        if (
+          arr[0] &&
+          arr[0].text === data.message &&
+          arr[0].from === data.from &&
+          arr[0].image === data.image
+        ) {
           return prev;
         }
         return {
           ...prev,
           [data.recipientID]: [
-            { from: data.from, text: data.message },
+            {
+              from: data.from,
+              text: data.message,
+              image: data.image,
+            },
             ...arr,
           ],
         };
@@ -187,8 +196,6 @@ export default function Page() {
           if (userMsg && userMsg.from?.id) {
             const userId = userMsg.from.id;
             const userName = userMsg.from.name || `User ${userId}`;
-            // Lấy avatar từ Facebook Graph API
-            // Nếu app không có quyền, avatar sẽ không lấy được, cần fallback ảnh mặc định
             let avatar = "";
             if (userId) {
               avatar = `https://graph.facebook.com/${userId}/picture?type=normal`;
@@ -244,7 +251,7 @@ export default function Page() {
   const handleSend = async () => {
     if ((!input.trim() && !image) || !selectedPage || !selectedUser) return;
 
-    const userMessage: Message = { from: "bot", text: input };
+    const userMessage: Message = { from: "bot", text: input, image: image ? "Image" : undefined };
 
     setMessages((prev) => ({
       ...prev,
@@ -298,7 +305,7 @@ export default function Page() {
           ...prev,
           [selectedUser.id]: prev[selectedUser.id].map((msg) =>
             msg.text === userMessage.text && msg.pending
-              ? { ...msg, pending: false }
+              ? { ...msg, pending: false, image: data.image }
               : msg
           ),
         }));
@@ -438,15 +445,19 @@ export default function Page() {
                           msg.from === "bot" ? "ml-auto items-end" : "mr-auto items-start"
                         }`}
                       >
-                        {msg.sticker ? (
+                        {msg.image && msg.image !== "Image" ? (
                           <img
-                            src={msg.sticker}
-                            alt="sticker"
-                            className="w-24 h-24 object-contain rounded"
+                            src={
+                              msg.image.startsWith("http")
+                                ? msg.image
+                                : `${API_URL}${msg.image}`
+                            }
+                            alt="image"
+                            className="w-32 h-32 object-cover rounded"
                           />
-                        ) : msg.text === "Image" && msg.pending ? (
+                        ) : msg.text === "Image" && msg.pending && image ? (
                           <img
-                            src={URL.createObjectURL(image!)}
+                            src={URL.createObjectURL(image)}
                             alt="Sending..."
                             className="w-32 h-32 object-cover rounded"
                           />
@@ -650,15 +661,19 @@ export default function Page() {
                         msg.from === "bot" ? "ml-auto items-end" : "mr-auto items-start"
                       }`}
                     >
-                      {msg.sticker ? (
+                      {msg.image && msg.image !== "Image" ? (
                         <img
-                          src={msg.sticker}
-                          alt="sticker"
-                          className="w-24 h-24 object-contain rounded"
+                          src={
+                            msg.image.startsWith("http")
+                              ? msg.image
+                              : `${API_URL}${msg.image}`
+                          }
+                          alt="image"
+                          className="w-32 h-32 object-cover rounded"
                         />
-                      ) : msg.text === "Image" && msg.pending ? (
+                      ) : msg.text === "Image" && msg.pending && image ? (
                         <img
-                          src={URL.createObjectURL(image!)}
+                          src={URL.createObjectURL(image)}
                           alt="Sending..."
                           className="w-32 h-32 object-cover rounded"
                         />
