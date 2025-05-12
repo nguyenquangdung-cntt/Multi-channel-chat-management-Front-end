@@ -70,33 +70,30 @@ export default function Page() {
 
       setMessages((prev) => {
         const arr = prev[data.recipientID] || [];
-        // Chỉ loại bỏ đúng tin nhắn pending cùng nội dung
         const filteredArr = arr.filter(
           (msg) =>
             !(
               msg.pending === true &&
               msg.from === data.from &&
-              msg.text === data.message &&
-              (msg.image === "Image" || msg.image === data.image)
+              msg.text === (data.image ? "Image" : data.message) &&
+              (msg.image === "Image")
             )
         );
-        // Nếu đã có tin nhắn non-pending giống hệt ở đầu danh sách, bỏ qua
         if (
           filteredArr.length > 0 &&
           !filteredArr[0].pending &&
-          filteredArr[0].text === data.message &&
+          filteredArr[0].text === (data.image ? "Image" : data.message) &&
           filteredArr[0].from === data.from &&
           filteredArr[0].image === data.image
         ) {
           return prev;
         }
-        // Thêm tin nhắn mới vào đầu danh sách
         return {
           ...prev,
           [data.recipientID]: [
             {
               from: data.from,
-              text: data.message,
+              text: data.image ? "Image" : data.message,
               image: data.image,
             },
             ...filteredArr,
@@ -270,7 +267,12 @@ export default function Page() {
   const handleSend = async () => {
     if ((!input.trim() && !image) || !selectedPage || !selectedUser) return;
 
-    const userMessage: Message = { from: "bot", text: input, image: image ? "Image" : undefined, pending: true };
+    const userMessage: Message = {
+      from: "bot",
+      text: image ? "Image" : input,
+      image: image ? "Image" : undefined,
+      pending: true,
+    };
 
     setMessages((prev) => ({
       ...prev,
@@ -319,11 +321,10 @@ export default function Page() {
         }));
       } else {
         setMessageStatus("sent");
-
         setMessages((prev) => ({
           ...prev,
           [selectedUser.id]: prev[selectedUser.id].map((msg) =>
-            msg.text === userMessage.text && msg.pending
+            msg.text === (image ? "Image" : input) && msg.pending
               ? { ...msg, pending: false, image: data.image }
               : msg
           ),
