@@ -5,14 +5,23 @@ import { faPaperPlane, faCamera } from "@fortawesome/free-solid-svg-icons";
 import { io, Socket } from "socket.io-client";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay } from "swiper/modules";
+import dynamic from "next/dynamic";
 import "swiper/css";
 import "swiper/css/navigation";
 import slide1 from "../../../public/images/slide-1.png";
 import slide2 from "../../../public/images/slide-2.png";
 import slide3 from "../../../public/images/slide-3.png";
 
+const EmojiPicker = dynamic(() => import("emoji-picker-react"), { ssr: false });
+
+const STICKERS = [
+  "/stickers/sticker1.png",
+  "/stickers/sticker2.png",
+  "/stickers/sticker3.png",
+];
+
 type User = { id: string; name: string; hasNewMessage?: boolean };
-type Message = { from: "user" | "bot"; text: string; pending?: boolean; error?: boolean };
+type Message = { from: "user" | "bot"; text: string; pending?: boolean; error?: boolean; sticker?: string };
 type Messages = { [userId: string]: Message[] };
 type Page = { id: string; name: string };
 
@@ -49,6 +58,8 @@ export default function Page() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [errorUserId, setErrorUserId] = useState<string | null>(null);
+  const [showEmoji, setShowEmoji] = useState(false);
+  const [showSticker, setShowSticker] = useState(false);
 
   const socketRef = useRef<Socket | null>(null);
 
@@ -85,7 +96,6 @@ export default function Page() {
             : user
         );
 
-        // Move the user with the new message to the top
         const userWithNewMessage = updatedUsers.find((user) => user.id === data.recipientID);
         const otherUsers = updatedUsers.filter((user) => user.id !== data.recipientID);
 
@@ -246,7 +256,7 @@ export default function Page() {
     }));
 
     setInput("");
-    setImage(null); // Clear the image after sending
+    setImage(null);
     setMessageStatus("sending");
     setShowStatusIndex(0);
 
@@ -312,6 +322,75 @@ export default function Page() {
         setMessageStatus("idle");
       }, 5000);
     }
+  };
+
+  const handleSendSticker = async (stickerUrl: string) => {
+    if (!selectedPage || !selectedUser) return;
+    setShowSticker(false);
+
+    const userMessage: Message = { from: "bot", text: "[Sticker]", pending: true };
+    setMessages((prev) => ({
+      ...prev,
+      [selectedUser.id]: [
+        { ...userMessage, text: "[Sticker]", sticker: stickerUrl, pending: true },
+        ...(prev[selectedUser.id] || []),
+      ],
+    }));
+    setMessageStatus("sending");
+    setShowStatusIndex(0);
+
+    try {
+      const res = await fetch(`${API_URL}/api/facebook-auth/${userID}/${selectedPage.id}/send-message`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          recipientID: selectedUser.id,
+          sticker: stickerUrl,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setMessageStatus("error");
+        setMessages((prev) => ({
+          ...prev,
+          [selectedUser.id]: prev[selectedUser.id].map((msg) =>
+            msg.sticker === stickerUrl && msg.pending
+              ? { ...msg, pending: false, error: true }
+              : msg
+          ),
+        }));
+      } else {
+        setMessageStatus("sent");
+        setMessages((prev) => ({
+          ...prev,
+          [selectedUser.id]: prev[selectedUser.id].map((msg) =>
+            msg.sticker === stickerUrl && msg.pending
+              ? { ...msg, pending: false }
+              : msg
+          ),
+        }));
+      }
+    } catch {
+      setMessageStatus("error");
+      setMessages((prev) => ({
+        ...prev,
+        [selectedUser.id]: prev[selectedUser.id].map((msg) =>
+          msg.sticker === stickerUrl && msg.pending
+            ? { ...msg, pending: false, error: true }
+            : msg
+        ),
+      }));
+    } finally {
+      setTimeout(() => {
+        setShowStatusIndex(null);
+        setMessageStatus("idle");
+      }, 5000);
+    }
+  };
+
+  const handleEmojiClick = (emojiData: any) => {
+    setInput((prev) => prev + emojiData.emoji);
+    setShowEmoji(false);
   };
 
   const handleTyping = () => {
@@ -416,7 +495,13 @@ export default function Page() {
                           msg.from === "bot" ? "ml-auto items-end" : "mr-auto items-start"
                         }`}
                       >
-                        {msg.text === "Image" && msg.pending ? (
+                        {msg.sticker ? (
+                          <img
+                            src={msg.sticker}
+                            alt="sticker"
+                            className="w-24 h-24 object-contain rounded"
+                          />
+                        ) : msg.text === "Image" && msg.pending ? (
                           <img
                             src={URL.createObjectURL(image!)}
                             alt="Sending..."
@@ -474,6 +559,44 @@ export default function Page() {
                       </button>
                     </div>
                   )}
+                  <div className="relative">
+                    <button
+                      type="button"
+                      className="bg-gray-200 text-gray-700 p-3 rounded-full hover:bg-gray-300 transition"
+                      onClick={() => setShowEmoji((v) => !v)}
+                      title="Chọn emoji"
+                    >
+                      😊
+                    </button>
+                    {showEmoji && (
+                      <div className="absolute bottom-12 left-0 z-50">
+                        <EmojiPicker onEmojiClick={handleEmojiClick} />
+                      </div>
+                    )}
+                  </div>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      className="bg-gray-200 text-gray-700 p-3 rounded-full hover:bg-gray-300 transition"
+                      onClick={() => setShowSticker((v) => !v)}
+                      title="Chọn sticker"
+                    >
+                      🖼️
+                    </button>
+                    {showSticker && (
+                      <div className="absolute bottom-12 left-0 z-50 bg-white border rounded shadow p-2 flex gap-2">
+                        {STICKERS.map((url) => (
+                          <img
+                            key={url}
+                            src={url}
+                            alt="sticker"
+                            className="w-12 h-12 cursor-pointer hover:scale-110 transition"
+                            onClick={() => handleSendSticker(url)}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
                   <input
                     type="text"
                     placeholder="Type a message..."
@@ -597,7 +720,13 @@ export default function Page() {
                         msg.from === "bot" ? "ml-auto items-end" : "mr-auto items-start"
                       }`}
                     >
-                      {msg.text === "Image" && msg.pending ? (
+                      {msg.sticker ? (
+                        <img
+                          src={msg.sticker}
+                          alt="sticker"
+                          className="w-24 h-24 object-contain rounded"
+                        />
+                      ) : msg.text === "Image" && msg.pending ? (
                         <img
                           src={URL.createObjectURL(image!)}
                           alt="Sending..."
@@ -655,6 +784,44 @@ export default function Page() {
                   </button>
                 </div>
               )}
+              <div className="relative">
+                <button
+                  type="button"
+                  className="bg-gray-200 text-gray-700 p-3 rounded-full hover:bg-gray-300 transition"
+                  onClick={() => setShowEmoji((v) => !v)}
+                  title="Chọn emoji"
+                >
+                  😊
+                </button>
+                {showEmoji && (
+                  <div className="absolute bottom-12 left-0 z-50">
+                    <EmojiPicker onEmojiClick={handleEmojiClick} />
+                  </div>
+                )}
+              </div>
+              <div className="relative">
+                <button
+                  type="button"
+                  className="bg-gray-200 text-gray-700 p-3 rounded-full hover:bg-gray-300 transition"
+                  onClick={() => setShowSticker((v) => !v)}
+                  title="Chọn sticker"
+                >
+                  🖼️
+                </button>
+                {showSticker && (
+                  <div className="absolute bottom-12 left-0 z-50 bg-white border rounded shadow p-2 flex gap-2">
+                    {STICKERS.map((url) => (
+                      <img
+                        key={url}
+                        src={url}
+                        alt="sticker"
+                        className="w-12 h-12 cursor-pointer hover:scale-110 transition"
+                        onClick={() => handleSendSticker(url)}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
               <input
                 type="text"
                 placeholder="Type a message..."
