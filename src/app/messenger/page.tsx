@@ -15,7 +15,7 @@ import slide3 from "../../../public/images/slide-3.png";
 const EmojiPicker = dynamic(() => import("emoji-picker-react"), { ssr: false });
 
 type User = { id: string; name: string; hasNewMessage?: boolean; avatar?: string };
-type Message = { from: "user" | "bot"; text: string; pending?: boolean; error?: boolean; sticker?: string; image?: string };
+type Message = { from: "user" | "bot"; text: string; pending?: boolean; error?: boolean; image?: string };
 type Messages = { [userId: string]: Message[] };
 type Page = { id: string; name: string };
 
@@ -76,7 +76,7 @@ export default function Page() {
             !(
               msg.from === data.from &&
               msg.text === data.message &&
-              (msg.image === "Image" || msg.image === data.image)
+              (msg.image === data.image)
             )
         );
         // Nếu đã có tin nhắn non-pending giống hệt ở đầu danh sách, bỏ qua
