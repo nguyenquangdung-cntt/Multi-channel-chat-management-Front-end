@@ -207,47 +207,47 @@ export default function HeaderMobile() {
             </header>
 
             <div className={`fixed top-0 left-0 w-[300px] h-full bg-gray-900 text-white transition-transform duration-300 z-50 sm:hidden ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
-                <div className="p-4 flex flex-col space-y-4">
-                    <button onClick={toggleSidebar} className="text-white text-xl mr-auto">
-                    ✕
-                    </button>
+              <div className="p-4 flex flex-col space-y-4">
+                  <button onClick={toggleSidebar} className="text-white text-xl mr-auto">
+                  ✕
+                  </button>
 
-                    {user && (
-                    <div className="flex items-center space-x-3 border-b border-gray-700 pb-4">
-                        <img src={user.picture?.data?.url} alt="User Avatar" className="w-12 h-12 rounded-full border border-gray-600" />
-                        <span className="text-lg font-semibold">{user.name}</span>
-                    </div>
-                    )}
+                  {user && (
+                  <div className="flex items-center space-x-3 border-b border-gray-700 pb-4">
+                      <img src={user.picture?.data?.url} alt="User Avatar" className="w-12 h-12 rounded-full border border-gray-600" />
+                      <span className="text-lg font-semibold">{user.name}</span>
+                  </div>
+                  )}
 
-                    <ul className="space-y-4">
-                        <li>
-                            <button onClick={() => handleNavigation("/")} className="flex items-center space-x-2 w-full text-left">
-                                <FontAwesomeIcon icon={faHouse} />
-                                <span>Dashboard</span>
-                            </button>
-                        </li>
-                        <li>
-                            <button onClick={() => handleNavigation("/messenger")} className="flex items-center space-x-2 w-full text-left">
-                                <FontAwesomeIcon icon={faCommentDots} />
-                                <span>Messenger</span>
-                            </button>
-                        </li>
-                    </ul>
+                  <ul className="space-y-4">
+                      <li>
+                          <button onClick={() => handleNavigation("/")} className="flex items-center space-x-2 w-full text-left">
+                              <FontAwesomeIcon icon={faHouse} />
+                              <span>Dashboard</span>
+                          </button>
+                      </li>
+                      <li>
+                          <button onClick={() => handleNavigation("/messenger")} className="flex items-center space-x-2 w-full text-left">
+                              <FontAwesomeIcon icon={faCommentDots} />
+                              <span>Messenger</span>
+                          </button>
+                      </li>
+                  </ul>
 
-                    {user ? (
-                    <button onClick={handleLogout} className="mt-4 bg-red-500 text-white px-4 py-2 rounded">
-                        Log out
-                    </button>
-                    ) : (
-                    <button onClick={() => setIsModalOpen(true)} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded">
-                        <FontAwesomeIcon icon={faRightToBracket} className="mr-2" /> Log in
-                    </button>
-                    )}
-                </div>
-                </div>
+                  {user ? (
+                  <button onClick={handleLogout} className="mt-4 bg-red-500 text-white px-4 py-2 rounded">
+                      Log out
+                  </button>
+                  ) : (
+                  <button onClick={() => setIsModalOpen(true)} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded">
+                      <FontAwesomeIcon icon={faRightToBracket} className="mr-2" /> Log in
+                  </button>
+                  )}
+              </div>
+            </div>
 
             {isModalOpen  && (
-                <div className="fixed inset-0 backdrop-blur-md backdrop-brightness-50 flex items-center justify-center z-50">
+                <div className="fixed inset-0 bg-blue-600 flex items-center justify-center z-50">
                     <div className="bg-white p-6 rounded shadow-lg w-full max-w-sm">
                       <div className="grid grid-cols-2 items-center">
                         <h2 className="text-xl font-semibold text-center text-left">

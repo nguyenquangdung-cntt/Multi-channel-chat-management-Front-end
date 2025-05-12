@@ -259,7 +259,7 @@ export default function Header() {
       </header>
 
       {isModalOpen && (
-        <div className="fixed inset-0 backdrop-blur-md backdrop-brightness-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-blue-600 flex items-center justify-center z-50">
           <div id="modal" className="bg-white p-6 rounded shadow-lg w-full max-w-sm">
             <div className="flex justify-between items-center mb-4">
               <FontAwesomeIcon icon={faCircleUser} className="text-[20px]"/> 
