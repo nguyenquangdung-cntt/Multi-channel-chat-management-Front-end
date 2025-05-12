@@ -70,33 +70,22 @@ export default function Page() {
 
       setMessages((prev) => {
         const arr = prev[data.recipientID] || [];
-        // Nếu đã có tin nhắn pending với cùng nội dung, cập nhật lại thành đã gửi (pending: false)
-        const pendingIdx = arr.findIndex(
+        // Xóa mọi tin nhắn pending cùng nội dung (text, image, from)
+        const filteredArr = arr.filter(
           (msg) =>
-            msg.pending &&
-            msg.from === data.from &&
-            msg.text === data.message &&
-            (msg.image === "Image" || msg.image === data.image)
+            !(
+              msg.pending &&
+              msg.from === data.from &&
+              msg.text === data.message &&
+              (msg.image === "Image" || msg.image === data.image)
+            )
         );
-        if (pendingIdx !== -1) {
-          // Cập nhật trạng thái pending thành false và cập nhật image nếu cần
-          const newArr = [...arr];
-          newArr[pendingIdx] = {
-            ...newArr[pendingIdx],
-            pending: false,
-            image: data.image || newArr[pendingIdx].image,
-          };
-          return {
-            ...prev,
-            [data.recipientID]: newArr,
-          };
-        }
         // Nếu đã có tin nhắn giống hệt (không phải pending), bỏ qua
         if (
-          arr[0] &&
-          arr[0].text === data.message &&
-          arr[0].from === data.from &&
-          arr[0].image === data.image
+          filteredArr[0] &&
+          filteredArr[0].text === data.message &&
+          filteredArr[0].from === data.from &&
+          filteredArr[0].image === data.image
         ) {
           return prev;
         }
@@ -109,7 +98,7 @@ export default function Page() {
               text: data.message,
               image: data.image,
             },
-            ...arr,
+            ...filteredArr,
           ],
         };
       });
