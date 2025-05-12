@@ -74,14 +74,16 @@ export default function Page() {
         const filteredArr = arr.filter(
           (msg) =>
             !(
+              msg.pending &&
               msg.from === data.from &&
               msg.text === data.message &&
-              (msg.image === data.image)
+              (msg.image === "Image" || msg.image === data.image)
             )
         );
         // Nếu đã có tin nhắn non-pending giống hệt ở đầu danh sách, bỏ qua
         if (
           filteredArr.length > 0 &&
+          !filteredArr[0].pending &&
           filteredArr[0].text === data.message &&
           filteredArr[0].from === data.from &&
           filteredArr[0].image === data.image
@@ -268,12 +270,12 @@ export default function Page() {
   const handleSend = async () => {
     if ((!input.trim() && !image) || !selectedPage || !selectedUser) return;
 
-    const userMessage: Message = { from: "bot", text: input, image: image ? "Image" : undefined };
+    const userMessage: Message = { from: "bot", text: input, image: image ? "Image" : undefined, pending: true };
 
     setMessages((prev) => ({
       ...prev,
       [selectedUser.id]: [
-        { ...userMessage, pending: false, text: image ? "Image" : input },
+        { ...userMessage, text: image ? "Image" : input },
         ...(prev[selectedUser.id] || []),
       ],
     }));
