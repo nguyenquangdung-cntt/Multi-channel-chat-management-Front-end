@@ -14,12 +14,6 @@ import slide3 from "../../../public/images/slide-3.png";
 
 const EmojiPicker = dynamic(() => import("emoji-picker-react"), { ssr: false });
 
-// const STICKERS = [
-//   "/stickers/sticker1.png",
-//   "/stickers/sticker2.png",
-//   "/stickers/sticker3.png",
-// ];
-
 type User = { id: string; name: string; hasNewMessage?: boolean; avatar?: string };
 type Message = { from: "user" | "bot"; text: string; pending?: boolean; error?: boolean; sticker?: string };
 type Messages = { [userId: string]: Message[] };
@@ -59,7 +53,6 @@ export default function Page() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [errorUserId, setErrorUserId] = useState<string | null>(null);
   const [showEmoji, setShowEmoji] = useState(false);
-  const [showSticker, setShowSticker] = useState(false);
 
   const socketRef = useRef<Socket | null>(null);
 
@@ -195,6 +188,7 @@ export default function Page() {
             const userId = userMsg.from.id;
             const userName = userMsg.from.name || `User ${userId}`;
             // Lấy avatar từ Facebook Graph API
+            // Nếu app không có quyền, avatar sẽ không lấy được, cần fallback ảnh mặc định
             let avatar = "";
             if (userId) {
               avatar = `https://graph.facebook.com/${userId}/picture?type=normal`;
@@ -329,70 +323,6 @@ export default function Page() {
     }
   };
 
-  const handleSendSticker = async (stickerUrl: string) => {
-    if (!selectedPage || !selectedUser) return;
-    setShowSticker(false);
-
-    const userMessage: Message = { from: "bot", text: "[Sticker]", pending: true };
-    setMessages((prev) => ({
-      ...prev,
-      [selectedUser.id]: [
-        { ...userMessage, text: "[Sticker]", sticker: stickerUrl, pending: true },
-        ...(prev[selectedUser.id] || []),
-      ],
-    }));
-    setMessageStatus("sending");
-    setShowStatusIndex(0);
-
-    try {
-      const res = await fetch(`${API_URL}/api/facebook-auth/${userID}/${selectedPage.id}/send-message`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          recipientID: selectedUser.id,
-          sticker: stickerUrl,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setMessageStatus("error");
-        setMessages((prev) => ({
-          ...prev,
-          [selectedUser.id]: prev[selectedUser.id].map((msg) =>
-            msg.sticker === stickerUrl && msg.pending
-              ? { ...msg, pending: false, error: true }
-              : msg
-          ),
-        }));
-      } else {
-        setMessageStatus("sent");
-        setMessages((prev) => ({
-          ...prev,
-          [selectedUser.id]: prev[selectedUser.id].map((msg) =>
-            msg.sticker === stickerUrl && msg.pending
-              ? { ...msg, pending: false }
-              : msg
-          ),
-        }));
-      }
-    } catch {
-      setMessageStatus("error");
-      setMessages((prev) => ({
-        ...prev,
-        [selectedUser.id]: prev[selectedUser.id].map((msg) =>
-          msg.sticker === stickerUrl && msg.pending
-            ? { ...msg, pending: false, error: true }
-            : msg
-        ),
-      }));
-    } finally {
-      setTimeout(() => {
-        setShowStatusIndex(null);
-        setMessageStatus("idle");
-      }, 5000);
-    }
-  };
-
   const handleEmojiClick = (emojiData: any) => {
     setInput((prev) => prev + emojiData.emoji);
     setShowEmoji(false);
@@ -456,6 +386,7 @@ export default function Page() {
                         src={user.avatar}
                         alt={user.name}
                         className="w-8 h-8 rounded-full object-cover mr-2"
+                        onError={e => { (e.target as HTMLImageElement).src = "/images/avatar-default.png"; }}
                       />
                     )}
                     <span>{user.name}</span>
@@ -586,29 +517,6 @@ export default function Page() {
                       </div>
                     )}
                   </div>
-                  {/* <div className="relative">
-                    <button
-                      type="button"
-                      className="bg-gray-200 text-gray-700 p-3 rounded-full hover:bg-gray-300 transition"
-                      onClick={() => setShowSticker((v) => !v)}
-                      title="Chọn sticker"
-                    >
-                      🖼️
-                    </button>
-                    {showSticker && (
-                      <div className="absolute bottom-12 left-0 z-50 bg-white border rounded shadow p-2 flex gap-2">
-                        {STICKERS.map((url) => (
-                          <img
-                            key={url}
-                            src={url}
-                            alt="sticker"
-                            className="w-12 h-12 cursor-pointer hover:scale-110 transition"
-                            onClick={() => handleSendSticker(url)}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </div> */}
                   <input
                     type="text"
                     placeholder="Type a message..."
@@ -689,6 +597,7 @@ export default function Page() {
                         src={user.avatar}
                         alt={user.name}
                         className="w-8 h-8 rounded-full object-cover mr-2"
+                        onError={e => { (e.target as HTMLImageElement).src = "/images/avatar-default.png"; }}
                       />
                     )}
                     <span className={user.hasNewMessage ? "font-bold" : ""}>
@@ -820,29 +729,6 @@ export default function Page() {
                   </div>
                 )}
               </div>
-              {/* <div className="relative">
-                <button
-                  type="button"
-                  className="bg-gray-200 text-gray-700 p-3 rounded-full hover:bg-gray-300 transition"
-                  onClick={() => setShowSticker((v) => !v)}
-                  title="Chọn sticker"
-                >
-                  🖼️
-                </button>
-                {showSticker && (
-                  <div className="absolute bottom-12 left-0 z-50 bg-white border rounded shadow p-2 flex gap-2">
-                    {STICKERS.map((url) => (
-                      <img
-                        key={url}
-                        src={url}
-                        alt="sticker"
-                        className="w-12 h-12 cursor-pointer hover:scale-110 transition"
-                        onClick={() => handleSendSticker(url)}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div> */}
               <input
                 type="text"
                 placeholder="Type a message..."
