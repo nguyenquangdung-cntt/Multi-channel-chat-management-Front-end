@@ -425,7 +425,7 @@ export default function Page() {
                     </div>
                   )}
                   <div ref={messagesEndRef} />
-                  {isTyping && (
+                  {/* {isTyping && (
                     <div className="ml-auto bg-gray-300 text-gray-700 px-4 py-2 rounded-2xl max-w-[80%]">
                       <div className="flex items-center space-x-1">
                         <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.2s]"></div>
@@ -433,7 +433,7 @@ export default function Page() {
                         <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
                       </div>
                     </div>
-                  )}
+                  )} */}
                   {loadingMessages ? (
                     [...Array(6)].map((_, i) => (
                       <div
@@ -641,7 +641,7 @@ export default function Page() {
                 </div>
               )}
               <div ref={messagesEndRef} />
-              {isTyping && (
+              {/* {isTyping && (
                 <div className="ml-auto bg-gray-300 text-gray-700 px-4 py-2 rounded-2xl max-w-[80%]">
                   <div className="flex items-center space-x-1">
                     <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.2s]"></div>
@@ -649,7 +649,7 @@ export default function Page() {
                     <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
                   </div>
                 </div>
-              )}
+              )} */}
               {loadingMessages ? (
                 [...Array(6)].map((_, i) => (
                   <div
