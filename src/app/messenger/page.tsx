@@ -14,13 +14,13 @@ import slide3 from "../../../public/images/slide-3.png";
 
 const EmojiPicker = dynamic(() => import("emoji-picker-react"), { ssr: false });
 
-const STICKERS = [
-  "/stickers/sticker1.png",
-  "/stickers/sticker2.png",
-  "/stickers/sticker3.png",
-];
+// const STICKERS = [
+//   "/stickers/sticker1.png",
+//   "/stickers/sticker2.png",
+//   "/stickers/sticker3.png",
+// ];
 
-type User = { id: string; name: string; hasNewMessage?: boolean };
+type User = { id: string; name: string; hasNewMessage?: boolean; avatar?: string };
 type Message = { from: "user" | "bot"; text: string; pending?: boolean; error?: boolean; sticker?: string };
 type Messages = { [userId: string]: Message[] };
 type Page = { id: string; name: string };
@@ -194,8 +194,13 @@ export default function Page() {
           if (userMsg && userMsg.from?.id) {
             const userId = userMsg.from.id;
             const userName = userMsg.from.name || `User ${userId}`;
+            // Lấy avatar từ Facebook Graph API
+            let avatar = "";
+            if (userId) {
+              avatar = `https://graph.facebook.com/${userId}/picture?type=normal`;
+            }
             if (!newUsers.find((u) => u.id === userId)) {
-              newUsers.push({ id: userId, name: userName });
+              newUsers.push({ id: userId, name: userName, avatar });
               newMessages[userId] = msgs.map((m: any) => ({
                 from: m.from?.id === fanpageId ? "bot" : "user",
                 text: m.message || "",
@@ -444,9 +449,16 @@ export default function Page() {
                   <div
                     key={user.id}
                     onClick={() => handleSelectUserMobile(user)}
-                    className="p-4 cursor-pointer hover:bg-blue-200 border border-gray-300"
+                    className="p-4 cursor-pointer hover:bg-blue-200 border border-gray-300 flex items-center gap-2"
                   >
-                    {user.name}
+                    {user.avatar && (
+                      <img
+                        src={user.avatar}
+                        alt={user.name}
+                        className="w-8 h-8 rounded-full object-cover mr-2"
+                      />
+                    )}
+                    <span>{user.name}</span>
                   </div>
                 ))
               )}
@@ -671,9 +683,18 @@ export default function Page() {
                       : "hover:bg-blue-200"
                   }`}
                 >
-                  <span className={user.hasNewMessage ? "font-bold" : ""}>
-                    {user.name}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    {user.avatar && (
+                      <img
+                        src={user.avatar}
+                        alt={user.name}
+                        className="w-8 h-8 rounded-full object-cover mr-2"
+                      />
+                    )}
+                    <span className={user.hasNewMessage ? "font-bold" : ""}>
+                      {user.name}
+                    </span>
+                  </div>
                   {user.hasNewMessage && (
                     <span className="w-2 h-2 bg-red-500 rounded-full"></span>
                   )}
