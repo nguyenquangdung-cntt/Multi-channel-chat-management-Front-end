@@ -127,6 +127,9 @@ export default function Page() {
             newMessages[userId] = msgs.map((m: any) => ({
               from: m.from?.id === fanpageId ? "bot" : "user",
               text: m.message || "",
+              image: m.attachments && m.attachments.data && m.attachments.data.length > 0 && m.attachments.data[0].type === "image"
+                ? m.attachments.data[0].image_data?.url
+                : undefined,
             }));
           }
         }
@@ -137,7 +140,7 @@ export default function Page() {
             mergedMessages[userId] = [
               ...(prev[userId] || []),
               ...newMessages[userId].filter(
-                (newMsg) => !(prev[userId] || []).some((oldMsg) => oldMsg.text === newMsg.text)
+                (newMsg) => !(prev[userId] || []).some((oldMsg) => oldMsg.text === newMsg.text && oldMsg.image === newMsg.image)
               ),
             ];
           }
@@ -205,6 +208,9 @@ export default function Page() {
               newMessages[userId] = msgs.map((m: any) => ({
                 from: m.from?.id === fanpageId ? "bot" : "user",
                 text: m.message || "",
+                image: m.attachments && m.attachments.data && m.attachments.data.length > 0 && m.attachments.data[0].type === "image"
+                  ? m.attachments.data[0].image_data?.url
+                  : undefined,
               }));
             }
           }
