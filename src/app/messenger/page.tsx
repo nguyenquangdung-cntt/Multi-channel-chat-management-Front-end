@@ -70,18 +70,20 @@ export default function Page() {
 
       setMessages((prev) => {
         const arr = prev[data.recipientID] || [];
-        // Loại bỏ mọi tin nhắn pending cùng nội dung (text, image, from)
+        // Chỉ loại bỏ tin nhắn pending cùng nội dung (text, image, from)
         const filteredArr = arr.filter(
           (msg) =>
             !(
+              msg.pending &&
               msg.from === data.from &&
               msg.text === data.message &&
               (msg.image === "Image" || msg.image === data.image)
             )
         );
-        // Nếu đã có tin nhắn giống hệt (không phải pending), bỏ qua
+        // Nếu đã có tin nhắn non-pending giống hệt ở đầu danh sách, bỏ qua
         if (
-          filteredArr[0] &&
+          filteredArr.length > 0 &&
+          !filteredArr[0].pending &&
           filteredArr[0].text === data.message &&
           filteredArr[0].from === data.from &&
           filteredArr[0].image === data.image
