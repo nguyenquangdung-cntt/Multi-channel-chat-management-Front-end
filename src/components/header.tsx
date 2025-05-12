@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRightToBracket, faCircleUser, faBell } from '@fortawesome/free-solid-svg-icons'; 
 import { faFacebook } from '@fortawesome/free-brands-svg-icons';
@@ -21,6 +21,7 @@ export default function Header() {
   const [tokenExpired, setTokenExpired] = useState(false);
   const [notifications, setNotifications] = useState<{ userName: string; message: string }[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
     window.fbAsyncInit = function () {
@@ -74,6 +75,26 @@ export default function Header() {
 
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    // Kết nối socket chỉ khi đã đăng nhập
+    if (!user) return;
+    if (!socketRef.current) {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      socketRef.current = io(API_URL);
+    }
+
+    // Ví dụ: lắng nghe sự kiện "notification"
+    socketRef.current.on("notification", (data: { userName: string; message: string }) => {
+      setNotifications((prev) => [data, ...prev]);
+    });
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.off("notification");
+      }
+    };
+  }, [user]);
 
   const handleLogin = () => {
     window.FB.login(
@@ -216,6 +237,7 @@ export default function Header() {
                         ))}
                         <button
                           className="text-blue-500 text-sm mt-2 hover:underline"
+                          onClick={() => setNotifications([])}
                         >
                           Clear all
                         </button>

@@ -74,7 +74,6 @@ export default function Page() {
         const filteredArr = arr.filter(
           (msg) =>
             !(
-              // msg.pending &&
               msg.from === data.from &&
               msg.text === data.message &&
               (msg.image === "Image" || msg.image === data.image)
