@@ -70,6 +70,28 @@ export default function Page() {
 
       setMessages((prev) => {
         const arr = prev[data.recipientID] || [];
+        // Nếu đã có tin nhắn pending với cùng nội dung, cập nhật lại thành đã gửi (pending: false)
+        const pendingIdx = arr.findIndex(
+          (msg) =>
+            msg.pending &&
+            msg.from === data.from &&
+            msg.text === data.message &&
+            (msg.image === "Image" || msg.image === data.image)
+        );
+        if (pendingIdx !== -1) {
+          // Cập nhật trạng thái pending thành false và cập nhật image nếu cần
+          const newArr = [...arr];
+          newArr[pendingIdx] = {
+            ...newArr[pendingIdx],
+            pending: false,
+            image: data.image || newArr[pendingIdx].image,
+          };
+          return {
+            ...prev,
+            [data.recipientID]: newArr,
+          };
+        }
+        // Nếu đã có tin nhắn giống hệt (không phải pending), bỏ qua
         if (
           arr[0] &&
           arr[0].text === data.message &&
@@ -78,6 +100,7 @@ export default function Page() {
         ) {
           return prev;
         }
+        // Thêm tin nhắn mới vào đầu danh sách
         return {
           ...prev,
           [data.recipientID]: [
