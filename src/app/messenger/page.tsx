@@ -70,7 +70,7 @@ export default function Page() {
 
       setMessages((prev) => {
         const arr = prev[data.recipientID] || [];
-        // Xóa mọi tin nhắn pending cùng nội dung (text, image, from)
+        // Loại bỏ mọi tin nhắn pending cùng nội dung (text, image, from)
         const filteredArr = arr.filter(
           (msg) =>
             !(
